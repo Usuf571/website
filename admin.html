@@ -5,10 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админка - ЭлектроМир</title>
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Google reCAPTCHA v3 -->
-    <script src="https://www.google.com/recaptcha/api.js?render=YOUR_SITE_KEY"></script> <!-- Замени YOUR_SITE_KEY на реальный site key -->
 </head>
 <body>
+    <!-- Эффект снега на новый год -->
+    <div id="snowflakes" class="snowflakes"></div>
+    
+    <!-- Красивый анимированный прелоадер -->
+    <div id="preloader">
+        <div class="loader"></div>
+        <div class="loader-text">Загрузка<span class="loading-dots"></span></div>
+    </div>
+
     <header>
         <div class="container">
             <div class="header-content">
@@ -22,18 +29,18 @@
         <div id="passwordPrompt" class="auth-form">
             <h2>Вход в админку</h2>
             <input type="password" id="adminPassword" placeholder="Пароль">
-            <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY" data-callback="onRecaptchaSuccess" data-action="login"></div> <!-- reCAPTCHA v2 checkbox; для v3 используй render -->
             <button class="btn" onclick="checkPassword()">Войти</button>
-            <p id="recaptchaError" style="color: red; display: none;">Пройдите верификацию reCAPTCHA!</p>
+            <p id="errorMessage" style="color: red; display: none; margin-top: 10px;"></p>
         </div>
 
         <div id="adminDashboard" style="display: none;">
             <!-- Боковая навигация с активной вкладкой -->
             <nav class="sidebar">
                 <ul>
-                    <li><a href="#" class="active" onclick="switchTab('products')">Товары</a></li>
-                    <li><a href="#" onclick="switchTab('reviews')">Отзывы</a></li>
-                    <li><a href="#" onclick="switchTab('settings')">Настройки</a></li>
+                    <li><a href="#" class="active" onclick="switchTab('products'); return false;">📦 Товары</a></li>
+                    <li><a href="#" onclick="switchTab('reviews'); return false;">⭐ Отзывы</a></li>
+                    <li><a href="#" onclick="switchTab('analytics'); return false;">📊 Статистика</a></li>
+                    <li><a href="#" onclick="switchTab('settings'); return false;">⚙️ Настройки</a></li>
                 </ul>
             </nav>
 
@@ -86,6 +93,45 @@
                         </tr>
                     </thead>
                     <tbody id="adminTableBodyReviews"></tbody>
+                </table>
+            </div>
+
+            <!-- Вкладка Статистика -->
+            <div id="analyticsTab" class="tab-content" style="display: none;">
+                <h1>📊 Статистика и аналитика</h1>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>📦 Всего товаров</h3>
+                        <p class="stat-number" id="totalProducts">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>💰 Средняя цена</h3>
+                        <p class="stat-number" id="avgPrice">0 ₽</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>⭐ Отзывов</h3>
+                        <p class="stat-number" id="totalReviews">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>❤️ В избранном</h3>
+                        <p class="stat-number" id="wishlistStats">0</p>
+                    </div>
+                </div>
+                
+                <h2 style="margin-top: 2rem; margin-bottom: 1rem;">Товары по категориям</h2>
+                <div id="categoryStats" style="margin: 1rem 0;"></div>
+                
+                <h2 style="margin-top: 2rem; margin-bottom: 1rem;">Популярные товары</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Категория</th>
+                            <th>Цена</th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody id="popularProductsTable"></tbody>
                 </table>
             </div>
 

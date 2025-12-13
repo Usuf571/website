@@ -14,36 +14,79 @@ let currentTab = 'products';
 let sortKey = 'id', sortDir = 1;
 let debounceTimer;
 
-// Инициализация настроек (логотип)
-document.getElementById('siteLogo').textContent = `Админка ${settings.siteName}`;
+// Функция для скрытия прелоадера
+function hidePreloader() {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        setTimeout(() => {
+            preloader.classList.add('hide');
+            setTimeout(() => preloader.style.display = 'none', 500);
+        }, 800);
+    }
+}
 
-// Пароль (проверка с base64)
+// Инициализация настроек (логотип)
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('siteLogo').textContent = `Админка ${settings.siteName}`;
+    hidePreloader();
+});
+
+// Пароль (проверка с base64 + логика 3 попыток)
+let loginAttempts = sessionStorage.getItem('loginAttempts') ? parseInt(sessionStorage.getItem('loginAttempts')) : 0;
+
 function checkPassword() {
     const password = document.getElementById('adminPassword').value;
-    const recaptchaResponse = grecaptcha.getResponse(); // Для v2
-    if (!recaptchaResponse) {
-        document.getElementById('recaptchaError').style.display = 'block';
+    const errorMessage = document.getElementById('errorMessage');
+    
+    if (!password) {
+        errorMessage.textContent = 'Введите пароль!';
+        errorMessage.style.display = 'block';
         return;
     }
-    document.getElementById('recaptchaError').style.display = 'none';
 
-    // Для реальной верификации: Отправь token на сервер (fetch('/verify-recaptcha', {token: recaptchaResponse}))
-    // Здесь симуляция (в проде — backend с secret key)
+    // Проверка пароля
     if (btoa(password) === settings.password) {
         document.getElementById('passwordPrompt').style.display = 'none';
         document.getElementById('adminDashboard').style.display = 'block';
+        sessionStorage.removeItem('loginAttempts');
         renderAdminTable('products');
         renderSettingsDisplay();
     } else {
-        alert('Неверный пароль!');
-        grecaptcha.reset(); // Сброс reCAPTCHA
+        loginAttempts++;
+        sessionStorage.setItem('loginAttempts', loginAttempts);
+        
+        const remainingAttempts = 3 - loginAttempts;
+        
+        if (remainingAttempts > 0) {
+            errorMessage.textContent = `❌ Неверный пароль! Осталось попыток: ${remainingAttempts}`;
+            errorMessage.style.display = 'block';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminPassword').focus();
+        } else {
+            // Закрыть страницу после 3 неправильных попыток
+            errorMessage.textContent = '❌ Слишком много неправильных попыток! Доступ закрыт на эту сессию.';
+            errorMessage.style.display = 'block';
+            document.getElementById('adminPassword').disabled = true;
+            document.querySelector('button.btn').disabled = true;
+            
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
     }
 }
 
-// Callback для v2 (если data-callback)
-function onRecaptchaSuccess(token) {
-    console.log('reCAPTCHA passed');
-}
+// Нажатие Enter для входа
+document.addEventListener('DOMContentLoaded', () => {
+    const passwordInput = document.getElementById('adminPassword');
+    if (passwordInput) {
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+    }
+});
 
 // Переключение вкладок
 function switchTab(tab) {
@@ -54,6 +97,7 @@ function switchTab(tab) {
     event.target.classList.add('active');
     if (tab === 'products') renderAdminTable('products', document.getElementById('adminSearchProducts').value);
     if (tab === 'reviews') renderAdminTable('reviews', document.getElementById('adminSearchReviews').value);
+    if (tab === 'analytics') renderAnalytics();
     if (tab === 'settings') renderSettingsDisplay();
 }
 
@@ -87,6 +131,8 @@ function sortTable(tab, key) {
 function renderAdminTable(tab, search = '') {
     const tbodyId = `adminTableBody${tab.charAt(0).toUpperCase() + tab.slice(1)}`;
     const tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+    
     const data = tab === 'products' ? products : reviews;
     let filtered = data.filter(item => {
         const searchLower = search.toLowerCase();
@@ -95,16 +141,22 @@ function renderAdminTable(tab, search = '') {
                item.text?.toLowerCase().includes(searchLower) ||
                item.desc?.toLowerCase().includes(searchLower);
     });
+    
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 2rem;">Нет результатов</td></tr>`;
+        return;
+    }
+    
     tbody.innerHTML = filtered.map(item => `
         <tr data-id="${item.id}">
             <td class="checkbox-col"><input type="checkbox" class="item-checkbox" value="${item.id}"></td>
-            <td>${item.id}</td>
-            <td>${tab === 'products' ? item.name : item.author}</td>
-            <td>${tab === 'products' ? `${item.price} ₽` : `★${item.rating}`}</td>
-            <td>${tab === 'products' ? item.category : item.date}</td>
-            <td>
-                <button class="admin-btn-small edit-btn" onclick="${tab === 'products' ? 'editProduct' : 'editReview'}(${item.id})">Редактировать</button>
-                <button class="admin-btn-small delete-btn" onclick="${tab === 'products' ? 'deleteProduct' : 'deleteReview'}(${item.id})">Удалить</button>
+            <td data-label="ID">${item.id}</td>
+            <td data-label="${tab === 'products' ? 'Название' : 'Автор'}">${tab === 'products' ? item.name : item.author}</td>
+            <td data-label="${tab === 'products' ? 'Цена' : 'Рейтинг'}">${tab === 'products' ? `${item.price} ₽` : `★${item.rating}`}</td>
+            <td data-label="${tab === 'products' ? 'Категория' : 'Дата'}">${tab === 'products' ? item.category : item.date}</td>
+            <td data-label="Действия">
+                <button class="admin-btn-small edit-btn" onclick="${tab === 'products' ? 'editProduct' : 'editReview'}(${item.id})">✏️ Ред.</button>
+                <button class="admin-btn-small delete-btn" onclick="${tab === 'products' ? 'deleteProduct' : 'deleteReview'}(${item.id})">🗑️ Удал.</button>
             </td>
         </tr>
     `).join('');
@@ -334,7 +386,108 @@ document.getElementById('settingsForm').addEventListener('submit', (e) => {
 
 // Закрытие модалов
 window.onclick = (e) => {
-    if (e.target.classList.contains('modal')) {
-        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    if (e.target.classList && e.target.classList.contains('modal')) {
+        document.querySelectorAll('.modal').forEach(m => {
+            if (m.style.display === 'block') {
+                m.style.display = 'none';
+            }
+        });
     }
 };
+
+// Функции для статистики и аналитики
+function renderAnalytics() {
+    // Статистика товаров
+    document.getElementById('totalProducts').textContent = products.length;
+    
+    const avgPrice = products.length > 0 
+        ? Math.round(products.reduce((sum, p) => sum + p.price, 0) / products.length)
+        : 0;
+    document.getElementById('avgPrice').textContent = avgPrice + ' ₽';
+    
+    // Отзывы
+    document.getElementById('totalReviews').textContent = reviews.length;
+    
+    // Избранные товары (из localStorage)
+    const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+    document.getElementById('wishlistStats').textContent = wishlist.length;
+    
+    // Статистика по категориям
+    const categories = ['phones', 'tablets', 'laptops'];
+    const categoryStats = document.getElementById('categoryStats');
+    categoryStats.innerHTML = categories.map(cat => {
+        const count = products.filter(p => p.category === cat).length;
+        const total = products.filter(p => p.category === cat).reduce((sum, p) => sum + p.price, 0);
+        const categoryNames = {
+            'phones': 'Телефоны',
+            'tablets': 'Планшеты',
+            'laptops': 'Ноутбуки'
+        };
+        return `
+            <div style="margin-bottom: 1rem; padding: 1rem; background: var(--card-bg); border-radius: 10px; border-left: 4px solid var(--accent-color);">
+                <strong>${categoryNames[cat]}</strong>: ${count} товаров | Сумма: ${total.toLocaleString()} ₽
+                <div style="width: 100%; background: #e0e0e0; height: 10px; border-radius: 5px; margin-top: 0.5rem; overflow: hidden;">
+                    <div style="width: ${count * 20}%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%;"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Популярные товары (по ID)
+    const popularTable = document.getElementById('popularProductsTable');
+    const popular = products.slice(0, 5);
+    popularTable.innerHTML = popular.map(p => `
+        <tr>
+            <td>${p.name}</td>
+            <td>${p.category === 'phones' ? 'Телефоны' : p.category === 'tablets' ? 'Планшеты' : 'Ноутбуки'}</td>
+            <td>${p.price.toLocaleString()} ₽</td>
+            <td><span style="color: green; font-weight: bold;">✓ В наличии</span></td>
+        </tr>
+    `).join('');
+}
+
+// 🎄 Новогодний эффект снега (копируем из main.js)
+function createSnowflakes() {
+    const snowflakesContainer = document.getElementById('snowflakes');
+    if (!snowflakesContainer) return;
+    
+    // Очищаем старые снежинки
+    snowflakesContainer.innerHTML = '';
+    
+    // Создаём 10 снежинок
+    const snowflakeSymbols = ['❄', '❅', '❆', '❇', '*'];
+    
+    for (let i = 0; i < 10; i++) {
+        const snowflake = document.createElement('div');
+        snowflake.className = 'snowflake';
+        snowflake.textContent = snowflakeSymbols[Math.floor(Math.random() * snowflakeSymbols.length)];
+        snowflake.style.left = Math.random() * 100 + '%';
+        snowflake.style.animationDelay = Math.random() * 2 + 's';
+        snowflake.style.animationDuration = (Math.random() * 5 + 8) + 's';
+        snowflakesContainer.appendChild(snowflake);
+    }
+    
+    // Создаём новые снежинки каждые 3 секунды для непрерывного эффекта
+    setInterval(() => {
+        const snowflake = document.createElement('div');
+        snowflake.className = 'snowflake';
+        snowflake.textContent = snowflakeSymbols[Math.floor(Math.random() * snowflakeSymbols.length)];
+        snowflake.style.left = Math.random() * 100 + '%';
+        snowflake.style.animationDuration = (Math.random() * 5 + 8) + 's';
+        snowflakesContainer.appendChild(snowflake);
+        
+        // Удаляем старые снежинки, чтобы не перегружать память
+        setTimeout(() => snowflake.remove(), (Math.random() * 5 + 8) * 1000);
+    }, 800);
+}
+
+// Обработка Enter для входа в админку
+document.addEventListener('DOMContentLoaded', () => {
+    const passwordPrompt = document.getElementById('passwordPrompt');
+    if (passwordPrompt && passwordPrompt.style.display !== 'none') {
+        hidePreloader();
+    }
+    
+    // Запуск снежинок при загрузке админки
+    createSnowflakes();
+});

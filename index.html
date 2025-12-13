@@ -7,20 +7,34 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <!-- Эффект снега на новый год -->
+    <div id="snowflakes" class="snowflakes"></div>
+    
+    <!-- Красивый анимированный прелоадер -->
+    <div id="preloader">
+        <div class="loader"></div>
+        <div class="loader-text">Загрузка<span class="loading-dots"></span></div>
+    </div>
+
     <header>
         <div class="container">
             <div class="header-content">
                 <div class="logo">ЭлектроМир</div>
+                <button class="menu-toggle" onclick="toggleMenu()">☰</button>
                 <div class="search-bar">
                     <input type="text" id="searchInput" placeholder="Поиск товаров...">
                 </div>
-                <div class="categories">
+                <div class="categories" id="categoriesMenu">
                     <button class="category-btn active" data-category="all">Все</button>
                     <button class="category-btn" data-category="phones">Телефоны</button>
                     <button class="category-btn" data-category="tablets">Планшеты</button>
                     <button class="category-btn" data-category="laptops">Ноутбуки</button>
                 </div>
-                <div class="cart-icon" onclick="toggleCart()">
+                <button class="theme-toggle" onclick="toggleDarkMode()" title="Тема">🌙</button>
+                <button class="wishlist-icon" onclick="toggleWishlist()" title="Избранное">
+                    ❤️ <span id="wishlistCount">0</span>
+                </button>
+                <div class="cart-icon" onclick="toggleCart()" title="Корзина">
                     🛒 <span id="cartCount">0</span>
                 </div>
                 <a href="admin.html" class="admin-btn">Админка</a>
@@ -56,6 +70,16 @@
             <div id="cartItems"></div>
             <p>Итого: <strong id="cartTotal">0</strong> ₽</p>
             <button class="btn" onclick="checkout()">Оформить заказ</button>
+        </div>
+    </div>
+
+    <!-- Вишлист модал -->
+    <div id="wishlistModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleWishlist()">&times;</span>
+            <h3>Избранное (<span id="wishlistTotalItems">0</span>)</h3>
+            <div id="wishlistItems" class="products-grid"></div>
+            <p id="wishlistEmpty" style="text-align: center; padding: 2rem; color: #999;">Нет избранных товаров</p>
         </div>
     </div>
 

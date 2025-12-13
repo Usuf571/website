@@ -1,3 +1,17 @@
+// Инициализация Dark Mode
+let isDarkMode = localStorage.getItem('darkMode') === 'true';
+if (isDarkMode) {
+    document.body.classList.add('dark-mode');
+    document.querySelector('.theme-toggle').textContent = '☀️';
+}
+
+function toggleDarkMode() {
+    isDarkMode = !isDarkMode;
+    localStorage.setItem('darkMode', isDarkMode);
+    document.body.classList.toggle('dark-mode');
+    document.querySelector('.theme-toggle').textContent = isDarkMode ? '☀️' : '🌙';
+}
+
 // Данные из localStorage или JSON
 let products = JSON.parse(localStorage.getItem('products')) || [
     { id: 1, name: 'iPhone 15', price: 1099, desc: 'Флагман с AI-камерой.', image: 'https://via.placeholder.com/280x220/ff9a9e/ffffff?text=iPhone', category: 'phones' },
@@ -15,16 +29,51 @@ let settings = JSON.parse(localStorage.getItem('settings')) || {  // Добав�
     storeAddress: 'Moscow, Russia'
 };
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
 let currentPage = 1;
 const itemsPerPage = 6;
+
+// Функция для скрытия прелоадера
+function hidePreloader() {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        setTimeout(() => {
+            preloader.classList.add('hide');
+            setTimeout(() => preloader.style.display = 'none', 500);
+        }, 800);
+    }
+}
+
+// Функция переключения мобильного меню
+function toggleMenu() {
+    const menu = document.getElementById('categoriesMenu');
+    if (menu) {
+        menu.classList.toggle('active');
+    }
+}
+
+// Закрытие меню при клике на категорию
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const menu = document.getElementById('categoriesMenu');
+            if (menu) menu.classList.remove('active');
+        });
+    });
+});
 
 // Инициализация настроек (логотип и карта)
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.logo').textContent = settings.siteName;
-    const mapIframe = document.querySelector('#map');
+    
+    // Правильное имя для iframe карты
+    const mapIframe = document.querySelector('.map');
     if (mapIframe) {
         mapIframe.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2245.2!2d37.6173!3d55.7558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46b54a5a5a5a5a5a%3A0x1a1a1a1a1a1a1a1a!2s${encodeURIComponent(settings.storeAddress)}!5e0!3m2!1sen!2sus!4v1630000000000`;
     }
+    
+    // Скрыть прелоадер после загрузки
+    hidePreloader();
 });
 
 // Рендер товаров с пагинацией и фильтрами (исправил вызовы для сохранения фильтров)
@@ -43,12 +92,16 @@ function renderProducts(filter = 'all', search = '', minPrice = 0, maxPrice = In
     paginated.forEach(product => {
         const card = document.createElement('div');
         card.className = 'product-card';
+        const isFavorite = wishlist.some(p => p.id === product.id);
         card.onclick = () => openProductModal(product);
         card.innerHTML = `
-            <div class="product-image"><img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/280x220?text=Изображение'"></div>
+            <div class="product-image" style="position: relative;">
+                <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/280x220?text=Изображение'">
+                <button class="heart-btn" data-id="${product.id}" style="position: absolute; top: 10px; right: 10px; background: white; border: none; font-size: 1.5rem; cursor: pointer; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;" onclick="event.stopPropagation(); addToWishlist(${product.id});" title="Добавить в избранное">${isFavorite ? '❤️' : '🤍'}</button>
+            </div>
             <div class="product-info">
                 <div class="product-name">${product.name}</div>
-                <div class="product-price">${product.price.toLocaleString()} сом</div>
+                <div class="product-price">${product.price.toLocaleString()} ₽</div>
             </div>
         `;
         grid.appendChild(card);
@@ -84,18 +137,66 @@ function getCurrentFilter() {
 
 // Модал товара
 function openProductModal(product) {
+    const isFavorite = wishlist.some(p => p.id === product.id);
+    const recommendations = getRecommendations(product.id);
+    const frequentlyBought = getFrequentlyBought(product.id);
+    
+    let recommendationsHTML = '';
+    if (recommendations.length > 0) {
+        recommendationsHTML = `
+            <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                <h4 style="margin-bottom: 1rem;">Похожие товары</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem;">
+                    ${recommendations.map(r => `
+                        <div style="cursor: pointer; padding: 0.5rem; border-radius: 10px; background: var(--card-bg); border: 1px solid var(--border-color);" onclick="openProductModal(products.find(p => p.id === ${r.id}))">
+                            <img src="${r.image}" alt="${r.name}" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 0.5rem;">
+                            <div style="font-size: 0.85rem; font-weight: bold;">${r.name}</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">${r.price.toLocaleString()} ₽</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    let frequentlyHTML = '';
+    if (frequentlyBought.length > 0) {
+        frequentlyHTML = `
+            <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                <h4 style="margin-bottom: 1rem;">Часто покупают вместе</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem;">
+                    ${frequentlyBought.map(r => `
+                        <div style="cursor: pointer; padding: 0.5rem; border-radius: 10px; background: var(--card-bg); border: 1px solid var(--border-color);" onclick="openProductModal(products.find(p => p.id === ${r.id}))">
+                            <img src="${r.image}" alt="${r.name}" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 0.5rem;">
+                            <div style="font-size: 0.85rem; font-weight: bold;">${r.name}</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">${r.price.toLocaleString()} ₽</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
     document.getElementById('modalBody').innerHTML = `
         <img src="${product.image}" alt="${product.name}" style="width: 100%; border-radius: 15px; margin-bottom: 1rem;" onerror="this.src='https://via.placeholder.com/300?text=Изображение'">
         <h3>${product.name}</h3>
         <p><strong>Цена:</strong> ${product.price.toLocaleString()} ₽</p>
         <p>${product.desc}</p>
-        <button class="btn" onclick="addToCart(${product.id}); event.stopPropagation();">В корзину</button>
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <button class="btn" style="flex: 1;" onclick="addToCart(${product.id}); event.stopPropagation();">В корзину</button>
+            <button class="heart-btn" data-id="${product.id}" style="padding: 0.75rem 1.5rem; font-size: 1.5rem; border: none; background: var(--card-bg); border-radius: 8px; cursor: pointer;" onclick="addToWishlist(${product.id}); this.textContent = wishlist.some(p => p.id === ${product.id}) ? '❤️' : '🤍';">${isFavorite ? '❤️' : '🤍'}</button>
+        </div>
+        ${recommendationsHTML}
+        ${frequentlyHTML}
     `;
     document.getElementById('productModal').style.display = 'block';
 }
 
 function closeModal() {
-    document.getElementById('productModal').style.display = 'none';
+    const modal = document.getElementById('productModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
 // Корзина (обновлённая часть)
@@ -178,27 +279,49 @@ const whatsappUrl = `https://wa.me/996222112120?text=${encodeURIComponent(messag
 
 // Поиск и категории
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-        renderProducts(getCurrentFilter(), e.target.value, 0, Infinity, currentPage = 1);
-    });
+    // Поиск с задержкой (debounce)
+    let searchTimeout;
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                renderProducts(getCurrentFilter(), e.target.value, 0, Infinity, currentPage = 1);
+            }, 300);
+        });
+    }
 
+    // Категории
     document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            renderProducts(btn.dataset.category, document.getElementById('searchInput').value, 0, Infinity, currentPage = 1);
+            renderProducts(btn.dataset.category, searchInput.value, 0, Infinity, currentPage = 1);
+            
+            // Закрыть мобильное меню
+            const menu = document.getElementById('categoriesMenu');
+            if (menu && window.innerWidth <= 768) {
+                menu.classList.remove('active');
+            }
         });
     });
 
     // Кнопка применить фильтры
-    const applyBtn = document.querySelector('.filters button');
+    const applyBtn = document.querySelector('.search-btn');
     if (applyBtn) {
         applyBtn.addEventListener('click', () => {
             const min = parseInt(document.getElementById('minPrice').value) || 0;
             const max = parseInt(document.getElementById('maxPrice').value) || Infinity;
-            renderProducts(getCurrentFilter(), document.getElementById('searchInput').value, min, max, currentPage = 1);
+            renderProducts(getCurrentFilter(), searchInput.value, min, max, currentPage = 1);
         });
     }
+    
+    // Инициализация товаров и отзывов
+    renderProducts();
+    renderReviews();
+    updateCartUI();
+    updateWishlistUI();
 });
 
 // Карусель отзывов
@@ -215,15 +338,144 @@ function updateCarousel() {
 }
 setInterval(nextSlide, 4000);
 
-// Инициализация
-document.addEventListener('DOMContentLoaded', () => {
-    renderProducts();
-    renderReviews();
-    updateCartUI();
-});
+// Функции Вишлиста
+function toggleWishlist() {
+    const modal = document.getElementById('wishlistModal');
+    modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+    if (modal.style.display === 'block') renderWishlist();
+}
+
+function addToWishlist(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    const index = wishlist.findIndex(p => p.id === productId);
+    if (index > -1) {
+        wishlist.splice(index, 1);
+    } else {
+        wishlist.push(product);
+    }
+    localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    updateWishlistUI();
+}
+
+function removeFromWishlist(productId) {
+    const index = wishlist.findIndex(p => p.id === productId);
+    if (index > -1) {
+        wishlist.splice(index, 1);
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        updateWishlistUI();
+        renderWishlist();
+    }
+}
+
+function renderWishlist() {
+    const container = document.getElementById('wishlistItems');
+    const emptyMsg = document.getElementById('wishlistEmpty');
+    
+    if (wishlist.length === 0) {
+        container.innerHTML = '';
+        emptyMsg.style.display = 'block';
+        return;
+    }
+    
+    emptyMsg.style.display = 'none';
+    container.innerHTML = wishlist.map(product => `
+        <div class="product-card">
+            <div class="product-image"><img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/280x220?text=Изображение'"></div>
+            <div class="product-info">
+                <div class="product-name">${product.name}</div>
+                <div class="product-price">${product.price.toLocaleString()} ₽</div>
+                <div class="wishlist-actions" style="margin-top: 0.5rem;">
+                    <button class="btn" style="width: 100%; padding: 0.5rem;" onclick="addToCart(${product.id})">В корзину</button>
+                    <button class="btn" style="width: 100%; padding: 0.5rem; background: #ff6b6b; margin-top: 0.5rem;" onclick="removeFromWishlist(${product.id})">Удалить</button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updateWishlistUI() {
+    const count = document.getElementById('wishlistCount');
+    count.textContent = wishlist.length;
+    
+    // Обновляем иконки сердечек на карточках
+    document.querySelectorAll('.product-card').forEach(card => {
+        const heartBtn = card.querySelector('.heart-btn');
+        if (heartBtn) {
+            const productId = parseInt(heartBtn.dataset.id);
+            const isFavorite = wishlist.some(p => p.id === productId);
+            heartBtn.textContent = isFavorite ? '❤️' : '🤍';
+        }
+    });
+}
+
+// Функции Рекомендаций
+function getRecommendations(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) return [];
+    
+    // Рекомендуем товары из той же категории и разной цены
+    return products
+        .filter(p => p.category === product.category && p.id !== productId)
+        .slice(0, 3);
+}
+
+function getFrequentlyBought(productId) {
+    // Рекомендуем товары из разных категорий
+    const product = products.find(p => p.id === productId);
+    if (!product) return [];
+    
+    const others = products.filter(p => p.category !== product.category);
+    return others.slice(0, 2);
+}
+
+// 🎄 Новогодний эффект снега
+function createSnowflakes() {
+    const snowflakesContainer = document.getElementById('snowflakes');
+    if (!snowflakesContainer) return;
+    
+    // Очищаем старые снежинки
+    snowflakesContainer.innerHTML = '';
+    
+    // Создаём 10 снежинок
+    const snowflakeSymbols = ['❄', '❅', '❆', '❇', '*'];
+    
+    for (let i = 0; i < 10; i++) {
+        const snowflake = document.createElement('div');
+        snowflake.className = 'snowflake';
+        snowflake.textContent = snowflakeSymbols[Math.floor(Math.random() * snowflakeSymbols.length)];
+        snowflake.style.left = Math.random() * 100 + '%';
+        snowflake.style.animationDelay = Math.random() * 2 + 's';
+        snowflake.style.animationDuration = (Math.random() * 5 + 8) + 's';
+        snowflakesContainer.appendChild(snowflake);
+    }
+    
+    // Создаём новые снежинки каждые 3 секунды для непрерывного эффекта
+    setInterval(() => {
+        const snowflake = document.createElement('div');
+        snowflake.className = 'snowflake';
+        snowflake.textContent = snowflakeSymbols[Math.floor(Math.random() * snowflakeSymbols.length)];
+        snowflake.style.left = Math.random() * 100 + '%';
+        snowflake.style.animationDuration = (Math.random() * 5 + 8) + 's';
+        snowflakesContainer.appendChild(snowflake);
+        
+        // Удаляем старые снежинки, чтобы не перегружать память
+        setTimeout(() => snowflake.remove(), (Math.random() * 5 + 8) * 1000);
+    }, 800);
+}
 
 window.onclick = (e) => {
-    if (e.target.classList.contains('modal')) {
-        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+    if (e.target.classList && e.target.classList.contains('modal')) {
+        document.querySelectorAll('.modal').forEach(m => {
+            if (m.style.display === 'block') {
+                m.style.display = 'none';
+            }
+        });
     }
 };
+
+// Запуск снежинок при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    createSnowflakes();
+});

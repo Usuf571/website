@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка - ЭлектроМир</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Google reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=YOUR_SITE_KEY"></script> <!-- Замени YOUR_SITE_KEY на реальный site key -->
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo" id="siteLogo">Админка ЭлектроМир</div>
+                <a href="index.html" class="admin-btn">На сайт</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="passwordPrompt" class="auth-form">
+            <h2>Вход в админку</h2>
+            <input type="password" id="adminPassword" placeholder="Пароль">
+            <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY" data-callback="onRecaptchaSuccess" data-action="login"></div> <!-- reCAPTCHA v2 checkbox; для v3 используй render -->
+            <button class="btn" onclick="checkPassword()">Войти</button>
+            <p id="recaptchaError" style="color: red; display: none;">Пройдите верификацию reCAPTCHA!</p>
+        </div>
+
+        <div id="adminDashboard" style="display: none;">
+            <!-- Боковая навигация с активной вкладкой -->
+            <nav class="sidebar">
+                <ul>
+                    <li><a href="#" class="active" onclick="switchTab('products')">Товары</a></li>
+                    <li><a href="#" onclick="switchTab('reviews')">Отзывы</a></li>
+                    <li><a href="#" onclick="switchTab('settings')">Настройки</a></li>
+                </ul>
+            </nav>
+
+            <!-- Вкладка Товары -->
+            <div id="productsTab" class="tab-content">
+                <h1>Управление товарами</h1>
+                <div class="bulk-actions">
+                    <input type="checkbox" id="selectAllProducts" onclick="toggleSelectAll('products')"> Выбрать все
+                    <button class="btn admin-btn-small" onclick="bulkDelete('products')">Массовое удаление</button>
+                </div>
+                <button class="btn" onclick="openAddModal()">Добавить товар</button>
+                <button class="btn" onclick="exportProducts()" style="background: #28a745;">Экспорт JSON</button>
+                <input type="text" id="adminSearchProducts" placeholder="Поиск товаров..." oninput="debouncedRender('products')">
+
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-col"><input type="checkbox" id="headerCheckboxProducts"></th>
+                            <th onclick="sortTable('products', 'id')">ID ▲</th>
+                            <th onclick="sortTable('products', 'name')">Название ▲</th>
+                            <th onclick="sortTable('products', 'price')">Цена ▲</th>
+                            <th onclick="sortTable('products', 'category')">Категория ▲</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBodyProducts"></tbody>
+                </table>
+            </div>
+
+            <!-- Вкладка Отзывы -->
+            <div id="reviewsTab" class="tab-content" style="display: none;">
+                <h1>Управление отзывами</h1>
+                <div class="bulk-actions">
+                    <input type="checkbox" id="selectAllReviews" onclick="toggleSelectAll('reviews')"> Выбрать все
+                    <button class="btn admin-btn-small" onclick="bulkDelete('reviews')">Массовое удаление</button>
+                </div>
+                <button class="btn" onclick="openReviewModal()">Добавить отзыв</button>
+                <button class="btn" onclick="exportReviews()" style="background: #28a745;">Экспорт JSON</button>
+                <input type="text" id="adminSearchReviews" placeholder="Поиск отзывов..." oninput="debouncedRender('reviews')">
+
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-col"><input type="checkbox" id="headerCheckboxReviews"></th>
+                            <th onclick="sortTable('reviews', 'id')">ID ▲</th>
+                            <th onclick="sortTable('reviews', 'author')">Автор ▲</th>
+                            <th onclick="sortTable('reviews', 'rating')">Рейтинг ▲</th>
+                            <th onclick="sortTable('reviews', 'date')">Дата ▲</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBodyReviews"></tbody>
+                </table>
+            </div>
+
+            <!-- Вкладка Настройки -->
+            <div id="settingsTab" class="tab-content" style="display: none;">
+                <h1>Настройки сайта</h1>
+                <button class="btn" onclick="openSettingsModal()">Редактировать настройки</button>
+                <div id="settingsDisplay" style="margin-top: 2rem; padding: 1rem; background: #f8f9ff; border-radius: 10px;">
+                    <!-- Текущие настройки будут здесь -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Модал для товаров (как раньше) -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddModal()">&times;</span>
+            <h3 id="modalTitle">Добавить товар</h3>
+            <form id="productForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label>Название</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label>Цена (₽)</label>
+                    <input type="number" id="productPrice" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea id="productDesc" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>URL изображения</label>
+                    <input type="url" id="productImage" required>
+                </div>
+                <div class="form-group">
+                    <label>Категория</label>
+                    <select id="productCategory" required>
+                        <option value="phones">Телефоны</option>
+                        <option value="tablets">Планшеты</option>
+                        <option value="laptops">Ноутбуки</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модал для отзывов -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeReviewModal()">&times;</span>
+            <h3 id="reviewModalTitle">Добавить отзыв</h3>
+            <form id="reviewForm">
+                <input type="hidden" id="editReviewId">
+                <div class="form-group">
+                    <label>Автор</label>
+                    <input type="text" id="reviewAuthor" required>
+                </div>
+                <div class="form-group">
+                    <label>Текст отзыва</label>
+                    <textarea id="reviewText" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Рейтинг (1-5)</label>
+                    <select id="reviewRating" required>
+                        <option value="1">1 звезда</option>
+                        <option value="2">2 звезды</option>
+                        <option value="3">3 звезды</option>
+                        <option value="4">4 звезды</option>
+                        <option value="5">5 звёзд</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модал для настроек -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSettingsModal()">&times;</span>
+            <h3>Настройки сайта</h3>
+            <form id="settingsForm">
+                <div class="form-group">
+                    <label>Название сайта</label>
+                    <input type="text" id="siteName" required>
+                </div>
+                <div class="form-group">
+                    <label>Адрес магазина (для карты)</label>
+                    <input type="text" id="storeAddress" placeholder="e.g., Moscow, Russia" required>
+                </div>
+                <div class="form-group">
+                    <label>Новый пароль админки</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <button type="submit" class="btn">Сохранить настройки</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>

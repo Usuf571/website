@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "name": "iPhone 15",
+        "price": 1099,
+        "desc": "Флагман с AI-камерой.",
+        "image": "https://via.placeholder.com/280x220/ff9a9e/ffffff?text=iPhone",
+        "category": "phones"
+    },
+    {
+        "id": 2,
+        "name": "Samsung Galaxy S24",
+        "price": 999,
+        "desc": "Мощный с fold-экраном.",
+        "image": "https://via.placeholder.com/280x220/6c5ce7/ffffff?text=Samsung",
+        "category": "phones"
+    },
+    {
+        "id": 3,
+        "name": "iPad Air",
+        "price": 799,
+        "desc": "Легкий планшет для работы.",
+        "image": "https://via.placeholder.com/280x220/a55eea/ffffff?text=iPad",
+        "category": "tablets"
+    },
+    {
+        "id": 4,
+        "name": "MacBook Pro",
+        "price": 1999,
+        "desc": "Профессиональный ноутбук.",
+        "image": "https://via.placeholder.com/280x220/4834d4/ffffff?text=MacBook",
+        "category": "laptops"
+    }
+]

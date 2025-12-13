@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЭлектроМир - Продажа электроники</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">ЭлектроМир</div>
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Поиск товаров...">
+                </div>
+                <div class="categories">
+                    <button class="category-btn active" data-category="all">Все</button>
+                    <button class="category-btn" data-category="phones">Телефоны</button>
+                    <button class="category-btn" data-category="tablets">Планшеты</button>
+                    <button class="category-btn" data-category="laptops">Ноутбуки</button>
+                </div>
+                <div class="cart-icon" onclick="toggleCart()">
+                    🛒 <span id="cartCount">0</span>
+                </div>
+                <a href="admin.html" class="admin-btn">Админка</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Фильтры по цене -->
+        <div class="filters">
+            <label>Цена от: <input type="number" id="minPrice" min="0"></label>
+            <label>Цена до: <input type="number" id="maxPrice" min="0"></label>
+            <button class="search-btn" onclick="applyFilters()">Применить</button>
+        </div>
+
+        <div class="products-grid" id="productsGrid"></div>
+        <div class="pagination" id="pagination"></div>
+    </main>
+
+    <!-- Модал товара -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Корзина модал -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleCart()">&times;</span>
+            <h3>Корзина (<span id="cartTotalItems">0</span>)</h3>
+            <div id="cartItems"></div>
+            <p>Итого: <strong id="cartTotal">0</strong> ₽</p>
+            <button class="btn" onclick="checkout()">Оформить заказ</button>
+        </div>
+    </div>
+
+    <!-- Карусель отзывов -->
+    <section class="reviews-section">
+        <h2>Отзывы клиентов</h2>
+        <div class="carousel">
+            <div class="carousel-inner" id="carouselInner"></div>
+            <button class="carousel-btn prev" onclick="prevSlide()">&lt;</button>
+            <button class="carousel-btn next" onclick="nextSlide()">&gt;</button>
+        </div>
+    </section>
+
+    <!-- Карта -->
+    <section class="map-section">
+        <h2>Наш магазин</h2>
+<iframe class="map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d48527.50059342906!2d72.76679735065215!3d40.520180981759445!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38bdac017f5a2e85%3A0xe0a3c61dc6f47b95!2sOsh!5e0!3m2!1sen!2skg!4v1765204456462!5m2!1sen!2skg" allowfullscreen="" loading="lazy"></iframe>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 ЭлектроМир. Все права защищены.</p>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

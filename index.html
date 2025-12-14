@@ -37,6 +37,7 @@
                 <div class="cart-icon" onclick="toggleCart()" title="Корзина">
                     🛒 <span id="cartCount">0</span>
                 </div>
+                <button class="user-btn" onclick="toggleUserMenu()" title="Профиль" id="userBtn">👤</button>
                 <a href="admin.html" class="admin-btn">Админка</a>
             </div>
         </div>
@@ -68,7 +69,7 @@
             <span class="close" onclick="toggleCart()">&times;</span>
             <h3>Корзина (<span id="cartTotalItems">0</span>)</h3>
             <div id="cartItems"></div>
-            <p>Итого: <strong id="cartTotal">0</strong> ₽</p>
+            <p>Итого: <strong id="cartTotal">0</strong> сом</p>
             <button class="btn" onclick="checkout()">Оформить заказ</button>
         </div>
     </div>
@@ -80,6 +81,57 @@
             <h3>Избранное (<span id="wishlistTotalItems">0</span>)</h3>
             <div id="wishlistItems" class="products-grid"></div>
             <p id="wishlistEmpty" style="text-align: center; padding: 2rem; color: #999;">Нет избранных товаров</p>
+        </div>
+    </div>
+
+    <!-- Модал логина/регистрации -->
+    <div id="authModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close" onclick="toggleAuthModal()">&times;</span>
+            
+            <!-- Форма логина -->
+            <div id="loginForm" class="auth-section">
+                <h3>Вход в аккаунт</h3>
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="password" id="loginPassword" placeholder="Пароль" required>
+                <button class="btn" style="width: 100%; margin-top: 1rem;" onclick="loginUser()">Войти</button>
+                <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary);">
+                    Нет аккаунта? <a href="#" onclick="switchAuthForm()" style="color: #667eea; text-decoration: none;">Зарегистрироваться</a>
+                </p>
+            </div>
+
+            <!-- Форма регистрации -->
+            <div id="registerForm" class="auth-section" style="display: none;">
+                <h3>Создать аккаунт</h3>
+                <input type="text" id="registerName" placeholder="Имя" required>
+                <input type="email" id="registerEmail" placeholder="Email" required>
+                <input type="password" id="registerPassword" placeholder="Пароль" required>
+                <input type="password" id="registerConfirm" placeholder="Подтвердить пароль" required>
+                <button class="btn" style="width: 100%; margin-top: 1rem;" onclick="registerUser()">Зарегистрироваться</button>
+                <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary);">
+                    Уже есть аккаунт? <a href="#" onclick="switchAuthForm()" style="color: #667eea; text-decoration: none;">Войти</a>
+                </p>
+            </div>
+
+            <p id="authError" style="color: red; display: none; margin-top: 1rem; text-align: center;"></p>
+        </div>
+    </div>
+
+    <!-- Модал профиля пользователя -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleProfileModal()">&times;</span>
+            <h3>Мой профиль</h3>
+            
+            <div id="profileInfo" style="background: var(--card-bg); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                <p><strong>Имя:</strong> <span id="profileName"></span></p>
+                <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+                <button class="btn" style="background: #6c757d; margin-top: 1rem;" onclick="logoutUser()">Выход</button>
+            </div>
+
+            <h4 style="margin-top: 2rem;">История заказов</h4>
+            <div id="ordersList" style="max-height: 400px; overflow-y: auto;"></div>
+            <p id="noOrders" style="text-align: center; color: #999; padding: 2rem;">Заказов нет</p>
         </div>
     </div>
 
@@ -96,11 +148,11 @@
     <!-- Карта -->
     <section class="map-section">
         <h2>Наш магазин</h2>
-<iframe class="map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d48527.50059342906!2d72.76679735065215!3d40.520180981759445!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38bdac017f5a2e85%3A0xe0a3c61dc6f47b95!2sOsh!5e0!3m2!1sen!2skg!4v1765204456462!5m2!1sen!2skg" allowfullscreen="" loading="lazy"></iframe>
+<iframe class="map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d97055.12742821533!2d72.72559662466857!3d40.520093785446896!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38bdac017f5a2e85%3A0xe0a3c61dc6f47b95!2sOsh!5e0!3m2!1sen!2skg!4v1765689577052!5m2!1sen!2skg"allowfullscreen="" loading="lazy"></iframe>
     </section>
 
     <footer>
-        <p>&copy; 2025 ЭлектроМир. Все права защищены.</p>
+        <p>&copy; 2025 TechWorld. Все права защищены.</p>
     </footer>
 
     <script src="js/main.js"></script>

@@ -152,7 +152,7 @@ function renderAdminTable(tab, search = '') {
             <td class="checkbox-col"><input type="checkbox" class="item-checkbox" value="${item.id}"></td>
             <td data-label="ID">${item.id}</td>
             <td data-label="${tab === 'products' ? 'Название' : 'Автор'}">${tab === 'products' ? item.name : item.author}</td>
-            <td data-label="${tab === 'products' ? 'Цена' : 'Рейтинг'}">${tab === 'products' ? `${item.price} ₽` : `★${item.rating}`}</td>
+            <td data-label="${tab === 'products' ? 'Цена' : 'Рейтинг'}">${tab === 'products' ? `${item.price} сом` : `★${item.rating}`}</td>
             <td data-label="${tab === 'products' ? 'Категория' : 'Дата'}">${tab === 'products' ? item.category : item.date}</td>
             <td data-label="Действия">
                 <button class="admin-btn-small edit-btn" onclick="${tab === 'products' ? 'editProduct' : 'editReview'}(${item.id})">✏️ Ред.</button>
@@ -186,11 +186,18 @@ function bulkDelete(tab) {
 }
 
 // ТОВАРЫ: Полная реализация CRUD
+// Глобальная переменная для хранения загруженного изображения
+let uploadedImageData = null;
+
 function openAddModal(editId = null) {
     const form = document.getElementById('productForm');
     form.reset();
     document.getElementById('modalTitle').textContent = editId ? 'Редактировать товар' : 'Добавить товар';
     document.getElementById('editId').value = editId || '';
+    uploadedImageData = null;
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('productImageFile').value = '';
+    
     if (editId) {
         const product = products.find(p => p.id === editId);
         if (product) {
@@ -211,6 +218,41 @@ function closeAddModal() {
     document.getElementById('addModal').style.display = 'none';
 }
 
+// Функция для загрузки изображения
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Проверка типа файла
+    if (!file.type.startsWith('image/')) {
+        alert('Пожалуйста, выберите изображение!');
+        return;
+    }
+    
+    // Проверка размера файла (макс 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Размер файла не должен превышать 5MB!');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        uploadedImageData = e.target.result;
+        document.getElementById('previewImg').src = uploadedImageData;
+        document.getElementById('imagePreview').style.display = 'block';
+        document.getElementById('productImage').value = ''; // Очищаем URL поле
+    };
+    reader.readAsDataURL(file);
+}
+
+// Функция для очистки preview изображения
+function clearImagePreview() {
+    uploadedImageData = null;
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('productImageFile').value = '';
+    document.getElementById('productImage').value = '';
+}
+
 document.getElementById('productForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const form = e.target;
@@ -218,13 +260,21 @@ document.getElementById('productForm').addEventListener('submit', (e) => {
         alert('Заполните все поля правильно!');
         return;
     }
+    
+    // Проверяем, что есть изображение (либо загруженное, либо URL)
+    let imageUrl = uploadedImageData || document.getElementById('productImage').value.trim();
+    if (!imageUrl) {
+        alert('Пожалуйста, добавьте изображение!');
+        return;
+    }
+    
     const id = parseInt(document.getElementById('editId').value) || Date.now();
     const newProduct = {
         id,
         name: document.getElementById('productName').value.trim(),
         price: parseInt(document.getElementById('productPrice').value),
         desc: document.getElementById('productDesc').value.trim(),
-        image: document.getElementById('productImage').value.trim(),
+        image: imageUrl,
         category: document.getElementById('productCategory').value
     };
     const index = products.findIndex(p => p.id === id);
@@ -403,7 +453,7 @@ function renderAnalytics() {
     const avgPrice = products.length > 0 
         ? Math.round(products.reduce((sum, p) => sum + p.price, 0) / products.length)
         : 0;
-    document.getElementById('avgPrice').textContent = avgPrice + ' ₽';
+    document.getElementById('avgPrice').textContent = avgPrice + ' сом';
     
     // Отзывы
     document.getElementById('totalReviews').textContent = reviews.length;
@@ -425,7 +475,7 @@ function renderAnalytics() {
         };
         return `
             <div style="margin-bottom: 1rem; padding: 1rem; background: var(--card-bg); border-radius: 10px; border-left: 4px solid var(--accent-color);">
-                <strong>${categoryNames[cat]}</strong>: ${count} товаров | Сумма: ${total.toLocaleString()} ₽
+                <strong>${categoryNames[cat]}</strong>: ${count} товаров | Сумма: ${total.toLocaleString()} сом
                 <div style="width: 100%; background: #e0e0e0; height: 10px; border-radius: 5px; margin-top: 0.5rem; overflow: hidden;">
                     <div style="width: ${count * 20}%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%;"></div>
                 </div>
@@ -440,7 +490,7 @@ function renderAnalytics() {
         <tr>
             <td>${p.name}</td>
             <td>${p.category === 'phones' ? 'Телефоны' : p.category === 'tablets' ? 'Планшеты' : 'Ноутбуки'}</td>
-            <td>${p.price.toLocaleString()} ₽</td>
+            <td>${p.price.toLocaleString()} сом</td>
             <td><span style="color: green; font-weight: bold;">✓ В наличии</span></td>
         </tr>
     `).join('');

@@ -106,7 +106,7 @@
                     </div>
                     <div class="stat-card">
                         <h3>💰 Средняя цена</h3>
-                        <p class="stat-number" id="avgPrice">0 ₽</p>
+                        <p class="stat-number" id="avgPrice">0 сом</p>
                     </div>
                     <div class="stat-card">
                         <h3>⭐ Отзывов</h3>
@@ -158,7 +158,7 @@
                     <input type="text" id="productName" required>
                 </div>
                 <div class="form-group">
-                    <label>Цена (₽)</label>
+                    <label>Цена (сом)</label>
                     <input type="number" id="productPrice" min="0" required>
                 </div>
                 <div class="form-group">
@@ -166,8 +166,24 @@
                     <textarea id="productDesc" rows="3" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label>URL изображения</label>
-                    <input type="url" id="productImage" required>
+                    <label>Изображение товара</label>
+                    <div class="image-upload-container">
+                        <div class="image-preview" id="imagePreview" style="display: none;">
+                            <img id="previewImg" src="" alt="Preview" style="max-width: 100%; height: auto; border-radius: 10px; margin-bottom: 1rem;">
+                            <button type="button" class="btn" style="background: #6c757d; width: 100%; margin-bottom: 0.5rem;" onclick="clearImagePreview()">Очистить</button>
+                        </div>
+                        <div class="upload-options">
+                            <div class="form-group">
+                                <label>Загрузить с компьютера</label>
+                                <input type="file" id="productImageFile" accept="image/*" onchange="handleImageUpload(event)">
+                            </div>
+                            <div style="text-align: center; margin: 1rem 0; color: #999;">или</div>
+                            <div class="form-group">
+                                <label>URL изображения</label>
+                                <input type="url" id="productImage" placeholder="https://example.com/image.jpg">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Категория</label>

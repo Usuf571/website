@@ -101,7 +101,7 @@ function renderProducts(filter = 'all', search = '', minPrice = 0, maxPrice = In
             </div>
             <div class="product-info">
                 <div class="product-name">${product.name}</div>
-                <div class="product-price">${product.price.toLocaleString()} ₽</div>
+                <div class="product-price">${product.price.toLocaleString()} сом</div>
             </div>
         `;
         grid.appendChild(card);
@@ -151,7 +151,7 @@ function openProductModal(product) {
                         <div style="cursor: pointer; padding: 0.5rem; border-radius: 10px; background: var(--card-bg); border: 1px solid var(--border-color);" onclick="openProductModal(products.find(p => p.id === ${r.id}))">
                             <img src="${r.image}" alt="${r.name}" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 0.5rem;">
                             <div style="font-size: 0.85rem; font-weight: bold;">${r.name}</div>
-                            <div style="color: var(--text-secondary); font-size: 0.8rem;">${r.price.toLocaleString()} ₽</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">${r.price.toLocaleString()} сом</div>
                         </div>
                     `).join('')}
                 </div>
@@ -169,7 +169,7 @@ function openProductModal(product) {
                         <div style="cursor: pointer; padding: 0.5rem; border-radius: 10px; background: var(--card-bg); border: 1px solid var(--border-color);" onclick="openProductModal(products.find(p => p.id === ${r.id}))">
                             <img src="${r.image}" alt="${r.name}" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; margin-bottom: 0.5rem;">
                             <div style="font-size: 0.85rem; font-weight: bold;">${r.name}</div>
-                            <div style="color: var(--text-secondary); font-size: 0.8rem;">${r.price.toLocaleString()} ₽</div>
+                            <div style="color: var(--text-secondary); font-size: 0.8rem;">${r.price.toLocaleString()} сом</div>
                         </div>
                     `).join('')}
                 </div>
@@ -180,7 +180,7 @@ function openProductModal(product) {
     document.getElementById('modalBody').innerHTML = `
         <img src="${product.image}" alt="${product.name}" style="width: 100%; border-radius: 15px; margin-bottom: 1rem;" onerror="this.src='https://via.placeholder.com/300?text=Изображение'">
         <h3>${product.name}</h3>
-        <p><strong>Цена:</strong> ${product.price.toLocaleString()} ₽</p>
+        <p><strong>Цена:</strong> ${product.price.toLocaleString()} сом</p>
         <p>${product.desc}</p>
         <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
             <button class="btn" style="flex: 1;" onclick="addToCart(${product.id}); event.stopPropagation();">В корзину</button>
@@ -239,7 +239,7 @@ function updateCartUI() {
     // Рендер позиций с количеством и общей ценой
     itemsDiv.innerHTML = cart.map(item => `
         <div class="cart-item">
-            <span>${item.name} (x${item.quantity || 1}) — ${item.price.toLocaleString()} ₽/шт (итого: ${(item.price * (item.quantity || 1)).toLocaleString()} ₽)</span>
+            <span>${item.name} (x${item.quantity || 1}) — ${item.price.toLocaleString()} сом/шт (итого: ${(item.price * (item.quantity || 1)).toLocaleString()} сом)</span>
             <button onclick="removeFromCart(${item.id}); event.stopPropagation();">Удалить 🗑️</button>
         </div>
     `).join('');
@@ -253,20 +253,29 @@ function removeFromCart(id) {
 }
 
 function checkout() {
+    if (!currentUser) {
+        alert('Пожалуйста, войдите в аккаунт перед оформлением заказа!');
+        toggleAuthModal();
+        return;
+    }
+
     if (cart.length === 0) {
         alert('Корзина пуста!');
         return;
     }
 
+    // Сохраняем заказ в историю
+    const order = saveOrder();
+
     // Генерация сообщения
     const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
     const totalPrice = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
     let message = `Здравствуйте! Хочу оформить заказ из ${settings.siteName}:\n\n`;
-    message += cart.map((item, index) => `${index + 1}. ${item.name} (кол-во: ${item.quantity || 1}) — ${item.price.toLocaleString()} ₽/шт (итого: ${(item.price * (item.quantity || 1)).toLocaleString()} сом)`).join('\n');
-    message += `\n\nИтого товаров: ${totalItems}\nИтого к оплате: ${totalPrice.toLocaleString()} Сом\n\nДоставка в ${settings.storeAddress || 'Ош'}. Жду подтверждения!`;
+    message += cart.map((item, index) => `${index + 1}. ${item.name} (кол-во: ${item.quantity || 1}) — ${item.price.toLocaleString()} сом/шт (итого: ${(item.price * (item.quantity || 1)).toLocaleString()} сом)`).join('\n');
+    message += `\n\nИтого товаров: ${totalItems}\nИтого к оплате: ${totalPrice.toLocaleString()} Сом\n\nОтправитель: ${currentUser.name}\nEmail: ${currentUser.email}\nДоставка в ${settings.storeAddress || 'Ош'}. Жду подтверждения!`;
 
     // Открытие WhatsApp
-const whatsappUrl = `https://wa.me/996222112120?text=${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/996222112120?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
 
     // Очистка корзины
@@ -274,7 +283,7 @@ const whatsappUrl = `https://wa.me/996222112120?text=${encodeURIComponent(messag
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartUI();
     toggleCart();
-    alert('Заказ отправлен в WhatsApp! Проверьте чат.');
+    alert('✅ Заказ сохранён в вашу историю и отправлен в WhatsApp! Проверьте чат.');
 }
 
 // Поиск и категории
@@ -385,7 +394,7 @@ function renderWishlist() {
             <div class="product-image"><img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/280x220?text=Изображение'"></div>
             <div class="product-info">
                 <div class="product-name">${product.name}</div>
-                <div class="product-price">${product.price.toLocaleString()} ₽</div>
+                <div class="product-price">${product.price.toLocaleString()} сом</div>
                 <div class="wishlist-actions" style="margin-top: 0.5rem;">
                     <button class="btn" style="width: 100%; padding: 0.5rem;" onclick="addToCart(${product.id})">В корзину</button>
                     <button class="btn" style="width: 100%; padding: 0.5rem; background: #ff6b6b; margin-top: 0.5rem;" onclick="removeFromWishlist(${product.id})">Удалить</button>
@@ -475,7 +484,229 @@ window.onclick = (e) => {
     }
 };
 
+// 🔐 Система аутентификации и профиля пользователя
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+let users = JSON.parse(localStorage.getItem('users')) || [];
+let orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+function updateUserUI() {
+    const userBtn = document.getElementById('userBtn');
+    if (currentUser) {
+        userBtn.innerHTML = '👤 ' + currentUser.name.split(' ')[0];
+        userBtn.style.fontSize = '0.9rem';
+    } else {
+        userBtn.innerHTML = '👤';
+        userBtn.style.fontSize = '1.5rem';
+    }
+}
+
+function toggleAuthModal() {
+    const modal = document.getElementById('authModal');
+    modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+    if (modal.style.display === 'block') {
+        switchAuthForm(true);
+    }
+}
+
+function toggleProfileModal() {
+    if (!currentUser) {
+        toggleAuthModal();
+        return;
+    }
+    const modal = document.getElementById('profileModal');
+    modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+    if (modal.style.display === 'block') {
+        renderProfile();
+    }
+}
+
+function toggleUserMenu() {
+    if (currentUser) {
+        toggleProfileModal();
+    } else {
+        toggleAuthModal();
+    }
+}
+
+function switchAuthForm(toLogin = null) {
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    if (toLogin === null) {
+        loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+        registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
+    } else if (toLogin) {
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+    } else {
+        loginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+    }
+}
+
+function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function registerUser() {
+    const name = document.getElementById('registerName').value.trim();
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const confirm = document.getElementById('registerConfirm').value;
+    const errorEl = document.getElementById('authError');
+
+    errorEl.style.display = 'none';
+
+    if (!name || !email || !password || !confirm) {
+        errorEl.textContent = 'Заполните все поля!';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    if (!validateEmail(email)) {
+        errorEl.textContent = 'Введите корректный email!';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    if (password.length < 6) {
+        errorEl.textContent = 'Пароль должен быть не менее 6 символов!';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    if (password !== confirm) {
+        errorEl.textContent = 'Пароли не совпадают!';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    if (users.some(u => u.email === email)) {
+        errorEl.textContent = 'Пользователь с таким email уже существует!';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    const newUser = {
+        id: Date.now(),
+        name,
+        email,
+        password: btoa(password), // Простое кодирование (для реального приложения нужна хеширование)
+        created: new Date().toLocaleDateString('ru-RU')
+    };
+
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+    currentUser = newUser;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    toggleAuthModal();
+    updateUserUI();
+    alert('Добро пожаловать, ' + name + '! ✨');
+    
+    // Очистка формы
+    document.getElementById('registerForm').reset();
+}
+
+function loginUser() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('authError');
+
+    errorEl.style.display = 'none';
+
+    if (!email || !password) {
+        errorEl.textContent = 'Заполните все поля!';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    const user = users.find(u => u.email === email && u.password === btoa(password));
+
+    if (!user) {
+        errorEl.textContent = 'Неверный email или пароль!';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    currentUser = user;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    toggleAuthModal();
+    updateUserUI();
+    alert('Рады видеть вас снова, ' + user.name + '! 👋');
+    
+    // Очистка формы
+    document.getElementById('loginForm').reset();
+}
+
+function logoutUser() {
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    updateUserUI();
+    toggleProfileModal();
+    alert('Вы вышли из аккаунта! До встречи! 👋');
+}
+
+function renderProfile() {
+    if (!currentUser) return;
+
+    document.getElementById('profileName').textContent = currentUser.name;
+    document.getElementById('profileEmail').textContent = currentUser.email;
+
+    const userOrders = orders.filter(o => o.userId === currentUser.id);
+    const ordersList = document.getElementById('ordersList');
+    const noOrders = document.getElementById('noOrders');
+
+    if (userOrders.length === 0) {
+        ordersList.innerHTML = '';
+        noOrders.style.display = 'block';
+    } else {
+        noOrders.style.display = 'none';
+        ordersList.innerHTML = userOrders.map(order => `
+            <div class="order-item">
+                <h5>Заказ №${order.id}</h5>
+                <p><strong>Дата:</strong> ${order.date}</p>
+                <p><strong>Сумма:</strong> ${order.total.toLocaleString()} сом</p>
+                <p><strong>Товаров:</strong> ${order.items.length}</p>
+                <span class="order-status ${order.status === 'completed' ? 'completed' : 'pending'}">
+                    ${order.status === 'completed' ? '✓ Доставлено' : '⏳ В обработке'}
+                </span>
+            </div>
+        `).join('');
+    }
+}
+
+function saveOrder() {
+    if (!currentUser) {
+        alert('Пожалуйста, войдите в аккаунт перед заказом!');
+        toggleAuthModal();
+        return;
+    }
+
+    if (cart.length === 0) {
+        alert('Корзина пуста!');
+        return;
+    }
+
+    const totalPrice = cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
+    
+    const order = {
+        id: Date.now(),
+        userId: currentUser.id,
+        items: [...cart],
+        total: totalPrice,
+        date: new Date().toLocaleDateString('ru-RU'),
+        status: 'pending'
+    };
+
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+    
+    return order;
+}
+
 // Запуск снежинок при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     createSnowflakes();
+    updateUserUI();
 });

@@ -30,6 +30,8 @@ let settings = JSON.parse(localStorage.getItem('settings')) || {  // Добав�
 };
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+let pageViews = JSON.parse(localStorage.getItem('pageViews')) || {};
+let salesData = JSON.parse(localStorage.getItem('salesData')) || [];
 let currentPage = 1;
 const itemsPerPage = 6;
 
@@ -137,6 +139,11 @@ function getCurrentFilter() {
 
 // Модал товара
 function openProductModal(product) {
+    // Отслеживаем просмотр товара для аналитики
+    if (!pageViews[product.id]) pageViews[product.id] = 0;
+    pageViews[product.id]++;
+    localStorage.setItem('pageViews', JSON.stringify(pageViews));
+    
     const isFavorite = wishlist.some(p => p.id === product.id);
     const recommendations = getRecommendations(product.id);
     const frequentlyBought = getFrequentlyBought(product.id);
@@ -273,6 +280,11 @@ function checkout() {
     let message = `Здравствуйте! Хочу оформить заказ из ${settings.siteName}:\n\n`;
     message += cart.map((item, index) => `${index + 1}. ${item.name} (кол-во: ${item.quantity || 1}) — ${item.price.toLocaleString()} сом/шт (итого: ${(item.price * (item.quantity || 1)).toLocaleString()} сом)`).join('\n');
     message += `\n\nИтого товаров: ${totalItems}\nИтого к оплате: ${totalPrice.toLocaleString()} Сом\n\nОтправитель: ${currentUser.name}\nEmail: ${currentUser.email}\nДоставка в ${settings.storeAddress || 'Ош'}. Жду подтверждения!`;
+
+    // Отслеживаем продажи для аналитики
+    cart.forEach(item => {
+        recordSale(item.id, item.quantity || 1, item.price);
+    });
 
     // Открытие WhatsApp
     const whatsappUrl = `https://wa.me/996222112120?text=${encodeURIComponent(message)}`;
@@ -703,6 +715,19 @@ function saveOrder() {
     localStorage.setItem('orders', JSON.stringify(orders));
     
     return order;
+}
+
+// Функция для отслеживания продаж в аналитику
+function recordSale(productId, quantity, price) {
+    salesData.push({
+        id: salesData.length + 1,
+        productId,
+        quantity,
+        price,
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toLocaleTimeString()
+    });
+    localStorage.setItem('salesData', JSON.stringify(salesData));
 }
 
 // Запуск снежинок при загрузке страницы

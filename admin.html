@@ -38,8 +38,9 @@
             <nav class="sidebar">
                 <ul>
                     <li><a href="#" class="active" onclick="switchTab('products'); return false;">📦 Товары</a></li>
+                    <li><a href="#" onclick="switchTab('warehouse'); return false;">🏢 Склад</a></li>
                     <li><a href="#" onclick="switchTab('reviews'); return false;">⭐ Отзывы</a></li>
-                    <li><a href="#" onclick="switchTab('analytics'); return false;">📊 Статистика</a></li>
+                    <li><a href="#" onclick="switchTab('analytics'); return false;">📊 Аналитика</a></li>
                     <li><a href="#" onclick="switchTab('settings'); return false;">⚙️ Настройки</a></li>
                 </ul>
             </nav>
@@ -96,9 +97,81 @@
                 </table>
             </div>
 
-            <!-- Вкладка Статистика -->
+            <!-- Вкладка Склад -->
+            <div id="warehouseTab" class="tab-content" style="display: none;">
+                <h1>🏢 Управление складом</h1>
+                <div class="warehouse-controls">
+                    <button class="btn" onclick="openWarehouseModal()">➕ Добавить остаток</button>
+                    <button class="btn" onclick="exportWarehouse()" style="background: #28a745;">📥 Экспорт CSV</button>
+                    <button class="btn" onclick="exportWarehousePDF()" style="background: #0066cc;">📄 Экспорт PDF</button>
+                </div>
+                
+                <div class="warehouse-alerts" id="warehouseAlerts"></div>
+                
+                <div class="warehouse-stats">
+                    <div class="warehouse-stat-card">
+                        <h3>📦 Всего товаров на складе</h3>
+                        <p class="stat-number" id="totalStockItems">0 шт</p>
+                    </div>
+                    <div class="warehouse-stat-card">
+                        <h3>⚠️ Товаров на исходе</h3>
+                        <p class="stat-number" id="lowStockItems">0 шт</p>
+                    </div>
+                    <div class="warehouse-stat-card">
+                        <h3>❌ Нет в наличии</h3>
+                        <p class="stat-number" id="outOfStockItems">0 шт</p>
+                    </div>
+                    <div class="warehouse-stat-card">
+                        <h3>💵 Стоимость товаров</h3>
+                        <p class="stat-number" id="totalStockValue">0 сом</p>
+                    </div>
+                </div>
+
+                <h2 style="margin-top: 2rem; margin-bottom: 1rem;">История поступлений</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Товар</th>
+                            <th>Количество</th>
+                            <th>Цена закупки</th>
+                            <th>Сумма</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="warehouseHistoryTable"></tbody>
+                </table>
+
+                <h2 style="margin-top: 2rem; margin-bottom: 1rem;">Текущие остатки</h2>
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Товар</th>
+                            <th>Количество</th>
+                            <th>Минимум</th>
+                            <th>Статус</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="warehouseStockTable"></tbody>
+                </table>
+            </div>
+
+            <!-- Вкладка Аналитика -->
             <div id="analyticsTab" class="tab-content" style="display: none;">
-                <h1>📊 Статистика и аналитика</h1>
+                <h1>📊 Улучшенная аналитика</h1>
+                
+                <div class="analytics-controls">
+                    <select id="analyticsDateRange" onchange="updateAnalytics()">
+                        <option value="week">За неделю</option>
+                        <option value="month" selected>За месяц</option>
+                        <option value="year">За год</option>
+                        <option value="all">За все время</option>
+                    </select>
+                    <button class="btn" onclick="exportAnalyticsCSV()" style="background: #28a745;">📊 Экспорт CSV</button>
+                    <button class="btn" onclick="exportAnalyticsPDF()" style="background: #0066cc;">📄 Экспорт PDF</button>
+                </div>
+
                 <div class="stats-grid">
                     <div class="stat-card">
                         <h3>📦 Всего товаров</h3>
@@ -113,26 +186,33 @@
                         <p class="stat-number" id="totalReviews">0</p>
                     </div>
                     <div class="stat-card">
-                        <h3>❤️ В избранном</h3>
-                        <p class="stat-number" id="wishlistStats">0</p>
+                        <h3>👁️ Просмотров</h3>
+                        <p class="stat-number" id="totalViews">0</p>
                     </div>
                 </div>
-                
-                <h2 style="margin-top: 2rem; margin-bottom: 1rem;">Товары по категориям</h2>
-                <div id="categoryStats" style="margin: 1rem 0;"></div>
-                
-                <h2 style="margin-top: 2rem; margin-bottom: 1rem;">Популярные товары</h2>
+
+                <h2 style="margin-top: 2rem; margin-bottom: 1rem;">📈 График продаж по дням</h2>
+                <div id="salesChart" style="height: 300px; margin-bottom: 2rem; background: var(--card-bg); border-radius: 10px; padding: 1rem;"></div>
+
+                <h2 style="margin-top: 2rem; margin-bottom: 1rem;">🔝 Топ товаров по просмотрам</h2>
                 <table class="admin-table">
                     <thead>
                         <tr>
+                            <th>Место</th>
                             <th>Название</th>
-                            <th>Категория</th>
-                            <th>Цена</th>
-                            <th>Статус</th>
+                            <th>Просмотры</th>
+                            <th>Нравится</th>
+                            <th>Тренд</th>
                         </tr>
                     </thead>
-                    <tbody id="popularProductsTable"></tbody>
+                    <tbody id="topProductsTable"></tbody>
                 </table>
+
+                <h2 style="margin-top: 2rem; margin-bottom: 1rem;">🚦 Статистика трафика</h2>
+                <div class="traffic-stats" id="trafficStats"></div>
+
+                <h2 style="margin-top: 2rem; margin-bottom: 1rem;">📊 Товары по категориям</h2>
+                <div id="categoryStats" style="margin: 1rem 0;"></div>
             </div>
 
             <!-- Вкладка Настройки -->
@@ -247,6 +327,44 @@
                     <input type="password" id="newPassword" required>
                 </div>
                 <button type="submit" class="btn">Сохранить настройки</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модал для остатков на складе -->
+    <div id="warehouseModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeWarehouseModal()">&times;</span>
+            <h3 id="warehouseModalTitle">Добавить/Редактировать остаток</h3>
+            <form id="warehouseForm">
+                <input type="hidden" id="warehouseEditId">
+                <div class="form-group">
+                    <label>Товар</label>
+                    <select id="warehouseProductId" required>
+                        <option value="">Выберите товар...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Количество (шт)</label>
+                    <input type="number" id="warehouseQuantity" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Минимальный остаток (шт)</label>
+                    <input type="number" id="warehouseMinimum" min="1" value="5" required>
+                </div>
+                <div class="form-group">
+                    <label>Цена закупки (сом)</label>
+                    <input type="number" id="warehouseCostPrice" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Дата поступления</label>
+                    <input type="date" id="warehouseDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Примечание</label>
+                    <textarea id="warehouseNote" rows="3" placeholder="Дополнительная информация"></textarea>
+                </div>
+                <button type="submit" class="btn">Сохранить</button>
             </form>
         </div>
     </div>

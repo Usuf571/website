@@ -1386,3 +1386,187 @@ input, textarea, select {
     background: #d4edda;
     color: #155724;
 }
+
+/* ========== СТИЛИ ДЛЯ СКЛАДСКОГО УЧЁТА ========== */
+.warehouse-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.warehouse-controls .btn {
+    flex: 1;
+    min-width: 150px;
+}
+
+.warehouse-alerts {
+    margin-bottom: 2rem;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border-left: 4px solid;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    border-left-color: #ffc107;
+    color: #856404;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    border-left-color: #dc3545;
+    color: #721c24;
+}
+
+.warehouse-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.warehouse-stat-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.warehouse-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.warehouse-stat-card h3 {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.warehouse-stat-card .stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin: 0;
+}
+
+/* ========== СТИЛИ ДЛЯ АНАЛИТИКИ ========== */
+.analytics-controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.analytics-controls select {
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.analytics-controls select:hover {
+    border-color: var(--accent-color);
+}
+
+.analytics-controls select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.analytics-controls .btn {
+    flex: 0 1 auto;
+    min-width: 120px;
+}
+
+#salesChart {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.traffic-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.traffic-stats > div {
+    padding: 1rem;
+    background: var(--card-bg);
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-color);
+}
+
+.traffic-stats h4 {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.traffic-stats p {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin: 0;
+}
+
+/* Адаптивность для мобилок */
+@media (max-width: 768px) {
+    .warehouse-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .analytics-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .analytics-controls select,
+    .analytics-controls .btn {
+        width: 100%;
+    }
+
+    #salesChart {
+        height: 250px !important;
+    }
+
+    .warehouse-controls {
+        flex-direction: column;
+    }
+
+    .warehouse-controls .btn {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .warehouse-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .traffic-stats {
+        grid-template-columns: 1fr;
+    }
+}

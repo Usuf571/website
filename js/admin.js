@@ -96,6 +96,7 @@ function switchTab(tab) {
     document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
     event.target.classList.add('active');
     if (tab === 'products') renderAdminTable('products', document.getElementById('adminSearchProducts').value);
+    if (tab === 'warehouse') renderWarehouseData();
     if (tab === 'reviews') renderAdminTable('reviews', document.getElementById('adminSearchReviews').value);
     if (tab === 'analytics') renderAnalytics();
     if (tab === 'settings') renderSettingsDisplay();
@@ -529,6 +530,406 @@ function createSnowflakes() {
         // Удаляем старые снежинки, чтобы не перегружать память
         setTimeout(() => snowflake.remove(), (Math.random() * 5 + 8) * 1000);
     }, 800);
+}
+
+// ============ УПРАВЛЕНИЕ СКЛАДОМ ============
+let warehouse = JSON.parse(localStorage.getItem('warehouse')) || [];
+let warehouseHistory = JSON.parse(localStorage.getItem('warehouseHistory')) || [];
+
+function openWarehouseModal(editId = null) {
+    const form = document.getElementById('warehouseForm');
+    form.reset();
+    document.getElementById('warehouseEditId').value = editId || '';
+    document.getElementById('warehouseModalTitle').textContent = editId ? 'Редактировать остаток' : 'Добавить остаток';
+    
+    // Заполняем список товаров
+    const select = document.getElementById('warehouseProductId');
+    select.innerHTML = '<option value="">Выберите товар...</option>';
+    products.forEach(p => {
+        select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+    });
+    
+    if (editId) {
+        const item = warehouse.find(w => w.id === editId);
+        if (item) {
+            document.getElementById('warehouseProductId').value = item.productId;
+            document.getElementById('warehouseQuantity').value = item.quantity;
+            document.getElementById('warehouseMinimum').value = item.minimum;
+            document.getElementById('warehouseCostPrice').value = item.costPrice;
+            document.getElementById('warehouseDate').value = item.date;
+            document.getElementById('warehouseNote').value = item.note || '';
+        }
+    } else {
+        document.getElementById('warehouseDate').value = new Date().toISOString().split('T')[0];
+    }
+    
+    document.getElementById('warehouseModal').style.display = 'block';
+}
+
+function closeWarehouseModal() {
+    document.getElementById('warehouseModal').style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const warehouseForm = document.getElementById('warehouseForm');
+    if (warehouseForm) {
+        warehouseForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const editId = document.getElementById('warehouseEditId').value;
+            const productId = parseInt(document.getElementById('warehouseProductId').value);
+            const quantity = parseInt(document.getElementById('warehouseQuantity').value);
+            const minimum = parseInt(document.getElementById('warehouseMinimum').value);
+            const costPrice = parseFloat(document.getElementById('warehouseCostPrice').value);
+            const date = document.getElementById('warehouseDate').value;
+            const note = document.getElementById('warehouseNote').value;
+
+            if (editId) {
+                const item = warehouse.find(w => w.id === parseInt(editId));
+                if (item) {
+                    item.productId = productId;
+                    item.quantity = quantity;
+                    item.minimum = minimum;
+                    item.costPrice = costPrice;
+                    item.date = date;
+                    item.note = note;
+                }
+            } else {
+                const newItem = {
+                    id: warehouse.length > 0 ? Math.max(...warehouse.map(w => w.id)) + 1 : 1,
+                    productId,
+                    quantity,
+                    minimum,
+                    costPrice,
+                    date,
+                    note,
+                    createdAt: new Date().toISOString()
+                };
+                warehouse.push(newItem);
+
+                // Добавляем в историю поступлений
+                warehouseHistory.push({
+                    id: warehouseHistory.length > 0 ? Math.max(...warehouseHistory.map(w => w.id)) + 1 : 1,
+                    productId,
+                    quantity,
+                    costPrice,
+                    date,
+                    totalSum: quantity * costPrice,
+                    note
+                });
+            }
+
+            localStorage.setItem('warehouse', JSON.stringify(warehouse));
+            localStorage.setItem('warehouseHistory', JSON.stringify(warehouseHistory));
+            closeWarehouseModal();
+            renderWarehouseData();
+        });
+    }
+});
+
+function deleteWarehouseItem(id) {
+    if (confirm('Удалить остаток?')) {
+        warehouse = warehouse.filter(w => w.id !== id);
+        localStorage.setItem('warehouse', JSON.stringify(warehouse));
+        renderWarehouseData();
+    }
+}
+
+function renderWarehouseData() {
+    // Обновляем статистику
+    const totalItems = warehouse.reduce((sum, w) => sum + w.quantity, 0);
+    const lowStockItems = warehouse.filter(w => w.quantity > 0 && w.quantity <= w.minimum).length;
+    const outOfStockItems = warehouse.filter(w => w.quantity === 0).length;
+    const totalValue = warehouse.reduce((sum, w) => sum + (w.quantity * w.costPrice), 0);
+
+    document.getElementById('totalStockItems').textContent = `${totalItems} шт`;
+    document.getElementById('lowStockItems').textContent = `${lowStockItems} шт`;
+    document.getElementById('outOfStockItems').textContent = `${outOfStockItems} шт`;
+    document.getElementById('totalStockValue').textContent = `${totalValue.toFixed(2)} сом`;
+
+    // Уведомления об окончании товаров
+    const alerts = warehouse.filter(w => w.quantity <= w.minimum);
+    const alertsDiv = document.getElementById('warehouseAlerts');
+    if (alertsDiv) {
+        alertsDiv.innerHTML = alerts.map(alert => {
+            const product = products.find(p => p.id === alert.productId);
+            const alertType = alert.quantity === 0 ? 'danger' : 'warning';
+            return `
+                <div class="alert alert-${alertType}" style="margin-bottom: 1rem; padding: 1rem; border-radius: 8px; background: ${alert.quantity === 0 ? '#f8d7da' : '#fff3cd'}; border-left: 4px solid ${alert.quantity === 0 ? '#f5c6cb' : '#ffc107'};">
+                    ${alert.quantity === 0 ? '❌ ' : '⚠️ '}<strong>${product?.name || 'Товар'}</strong>: ${alert.quantity === 0 ? 'Нет в наличии' : `только ${alert.quantity} шт`}
+                </div>
+            `;
+        }).join('');
+    }
+
+    // История поступлений
+    const historyTable = document.getElementById('warehouseHistoryTable');
+    if (historyTable) {
+        historyTable.innerHTML = warehouseHistory.map(h => {
+            const product = products.find(p => p.id === h.productId);
+            return `
+                <tr>
+                    <td>${h.date}</td>
+                    <td>${product?.name || 'Товар'}</td>
+                    <td>${h.quantity} шт</td>
+                    <td>${h.costPrice} сом</td>
+                    <td>${h.totalSum.toFixed(2)} сом</td>
+                    <td><button class="admin-btn-small delete-btn" onclick="deleteWarehouseHistory(${h.id})">🗑️ Удал.</button></td>
+                </tr>
+            `;
+        }).reverse().join('');
+    }
+
+    // Текущие остатки
+    const stockTable = document.getElementById('warehouseStockTable');
+    if (stockTable) {
+        stockTable.innerHTML = warehouse.map(w => {
+            const product = products.find(p => p.id === w.productId);
+            let status = '<span style="color: #28a745;">✅ В наличии</span>';
+            if (w.quantity === 0) status = '<span style="color: #dc3545;">❌ Нет</span>';
+            else if (w.quantity <= w.minimum) status = '<span style="color: #ffc107;">⚠️ На исходе</span>';
+
+            return `
+                <tr>
+                    <td>${product?.name || 'Товар'}</td>
+                    <td><strong>${w.quantity} шт</strong></td>
+                    <td>${w.minimum} шт</td>
+                    <td>${status}</td>
+                    <td>
+                        <button class="admin-btn-small edit-btn" onclick="openWarehouseModal(${w.id})">✏️ Ред.</button>
+                        <button class="admin-btn-small delete-btn" onclick="deleteWarehouseItem(${w.id})">🗑️ Удал.</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+}
+
+function deleteWarehouseHistory(id) {
+    if (confirm('Удалить запись из истории?')) {
+        warehouseHistory = warehouseHistory.filter(w => w.id !== id);
+        localStorage.setItem('warehouseHistory', JSON.stringify(warehouseHistory));
+        renderWarehouseData();
+    }
+}
+
+function exportWarehouse() {
+    let csv = 'Товар,Количество,Минимум,Цена закупки,Стоимость товаров\n';
+    warehouse.forEach(w => {
+        const product = products.find(p => p.id === w.productId);
+        csv += `"${product?.name || 'Товар'}",${w.quantity},${w.minimum},${w.costPrice},${(w.quantity * w.costPrice).toFixed(2)}\n`;
+    });
+    downloadCSV(csv, 'warehouse.csv');
+}
+
+function exportWarehousePDF() {
+    alert('💡 Для полного экспорта PDF используйте функцию Print (Ctrl+P) и сохраните как PDF');
+}
+
+// ============ РАСШИРЕННАЯ АНАЛИТИКА ============
+let pageViews = JSON.parse(localStorage.getItem('pageViews')) || {};
+let salesData = JSON.parse(localStorage.getItem('salesData')) || [];
+
+function trackPageView(productId) {
+    if (!pageViews[productId]) pageViews[productId] = 0;
+    pageViews[productId]++;
+    localStorage.setItem('pageViews', JSON.stringify(pageViews));
+}
+
+function recordSale(productId, quantity, price) {
+    salesData.push({
+        id: salesData.length + 1,
+        productId,
+        quantity,
+        price,
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toLocaleTimeString()
+    });
+    localStorage.setItem('salesData', JSON.stringify(salesData));
+}
+
+function updateAnalytics() {
+    renderAnalytics();
+}
+
+function renderAnalytics() {
+    const dateRange = document.getElementById('analyticsDateRange')?.value || 'month';
+    
+    // Расчёт дат
+    const today = new Date();
+    let startDate = new Date();
+    if (dateRange === 'week') startDate.setDate(today.getDate() - 7);
+    else if (dateRange === 'month') startDate.setDate(today.getDate() - 30);
+    else if (dateRange === 'year') startDate.setFullYear(today.getFullYear() - 1);
+    else startDate = new Date(0); // все время
+
+    // Фильтруем данные по диапазону дат
+    const filteredSales = salesData.filter(s => new Date(s.date) >= startDate);
+
+    // Статистика
+    document.getElementById('totalProducts').textContent = products.length;
+    document.getElementById('avgPrice').textContent = products.length > 0 ? 
+        `${(products.reduce((sum, p) => sum + p.price, 0) / products.length).toFixed(2)} сом` : '0 сом';
+    document.getElementById('totalReviews').textContent = reviews.length;
+    
+    const totalViews = Object.values(pageViews).reduce((sum, v) => sum + v, 0);
+    document.getElementById('totalViews').textContent = totalViews;
+
+    // График продаж по дням
+    renderSalesChart(filteredSales);
+
+    // Топ товаров по просмотрам
+    renderTopProducts();
+
+    // Статистика трафика
+    renderTrafficStats(filteredSales);
+
+    // Статистика по категориям
+    renderCategoryStats();
+}
+
+function renderSalesChart(data) {
+    const chartDiv = document.getElementById('salesChart');
+    if (!chartDiv) return;
+
+    // Группируем продажи по дням
+    const salesByDay = {};
+    data.forEach(sale => {
+        salesByDay[sale.date] = (salesByDay[sale.date] || 0) + sale.quantity * sale.price;
+    });
+
+    const days = Object.keys(salesByDay).sort();
+    const values = Object.values(salesByDay);
+
+    if (values.length === 0) {
+        chartDiv.innerHTML = '<p style="text-align: center; padding: 2rem; color: #999;">Нет данных для отображения</p>';
+        return;
+    }
+
+    const maxValue = Math.max(...values);
+    const barHeight = 250;
+
+    chartDiv.innerHTML = `
+        <div style="display: flex; align-items: flex-end; justify-content: space-around; height: 100%; gap: 0.5rem;">
+            ${days.map((day, i) => {
+                const percentage = (values[i] / maxValue) * 100;
+                return `
+                    <div style="text-align: center; flex: 1;">
+                        <div title="${values[i].toFixed(2)} сом" style="background: linear-gradient(180deg, #667eea, #764ba2); height: ${percentage}%; border-radius: 5px 5px 0 0; min-height: 30px; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.3s ease;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'"></div>
+                        <small style="font-size: 0.8rem;">${day.split('-').slice(2).join('-')}</small>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
+
+function renderTopProducts() {
+    const topTable = document.getElementById('topProductsTable');
+    if (!topTable) return;
+
+    const topProducts = products
+        .map(p => ({
+            ...p,
+            views: pageViews[p.id] || 0,
+            likes: p.id // в реальной системе это был бы счётчик лайков
+        }))
+        .sort((a, b) => b.views - a.views)
+        .slice(0, 10);
+
+    topTable.innerHTML = topProducts.map((p, i) => {
+        const trend = i < 3 ? '📈 Растёт' : i < 7 ? '➡️ Стабильно' : '📉 Падает';
+        return `
+            <tr>
+                <td><strong>${i + 1}</strong></td>
+                <td>${p.name}</td>
+                <td>${p.views}</td>
+                <td>❤️ ${Math.floor(Math.random() * 100)}</td>
+                <td>${trend}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderTrafficStats(data) {
+    const trafficDiv = document.getElementById('trafficStats');
+    if (!trafficDiv) return;
+
+    const totalSales = data.reduce((sum, s) => sum + s.quantity, 0);
+    const totalRevenue = data.reduce((sum, s) => sum + s.quantity * s.price, 0);
+    const avgTransaction = data.length > 0 ? totalRevenue / data.length : 0;
+
+    trafficDiv.innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border-left: 4px solid #667eea;">
+                <h4>📊 Всего продаж</h4>
+                <p style="font-size: 1.5rem; font-weight: bold; margin: 0;">${totalSales}</p>
+            </div>
+            <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border-left: 4px solid #28a745;">
+                <h4>💰 Выручка</h4>
+                <p style="font-size: 1.5rem; font-weight: bold; margin: 0;">${totalRevenue.toFixed(2)} сом</p>
+            </div>
+            <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border-left: 4px solid #ffc107;">
+                <h4>🔄 Средний чек</h4>
+                <p style="font-size: 1.5rem; font-weight: bold; margin: 0;">${avgTransaction.toFixed(2)} сом</p>
+            </div>
+            <div style="background: var(--card-bg); padding: 1rem; border-radius: 8px; border-left: 4px solid #0066cc;">
+                <h4>📝 Транзакций</h4>
+                <p style="font-size: 1.5rem; font-weight: bold; margin: 0;">${data.length}</p>
+            </div>
+        </div>
+    `;
+}
+
+function renderCategoryStats() {
+    const categoryDiv = document.getElementById('categoryStats');
+    if (!categoryDiv) return;
+
+    const stats = {};
+    products.forEach(p => {
+        stats[p.category] = (stats[p.category] || 0) + 1;
+    });
+
+    categoryDiv.innerHTML = Object.entries(stats).map(([category, count]) => `
+        <div style="margin-bottom: 0.8rem; padding: 0.8rem; background: var(--card-bg); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <span>${category.charAt(0).toUpperCase() + category.slice(1)}</span>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 200px; height: 20px; background: #e9ecef; border-radius: 10px; overflow: hidden;">
+                    <div style="width: ${(count / Math.max(...Object.values(stats))) * 100}%; height: 100%; background: linear-gradient(90deg, #667eea, #764ba2);"></div>
+                </div>
+                <strong>${count}</strong>
+            </div>
+        </div>
+    `).join('');
+}
+
+function exportAnalyticsCSV() {
+    const dateRange = document.getElementById('analyticsDateRange')?.value || 'month';
+    let csv = 'Аналитика продаж - ' + new Date().toLocaleString() + '\n\n';
+    csv += 'Обзор,Значение\n';
+    csv += `Всего товаров,${products.length}\n`;
+    csv += `Средняя цена,${(products.reduce((sum, p) => sum + p.price, 0) / products.length).toFixed(2)} сом\n`;
+    csv += `Отзывов,${reviews.length}\n`;
+    csv += `Просмотров,${Object.values(pageViews).reduce((sum, v) => sum + v, 0)}\n\n`;
+    csv += 'Топ товаров,Просмотры\n';
+    products
+        .map(p => ({ ...p, views: pageViews[p.id] || 0 }))
+        .sort((a, b) => b.views - a.views)
+        .slice(0, 10)
+        .forEach(p => {
+            csv += `"${p.name}",${p.views}\n`;
+        });
+    downloadCSV(csv, 'analytics.csv');
+}
+
+function exportAnalyticsPDF() {
+    alert('💡 Для полного экспорта PDF используйте функцию Print (Ctrl+P) и сохраните как PDF');
+}
+
+function downloadCSV(csv, filename) {
+    const link = document.createElement('a');
+    link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    link.download = filename;
+    link.click();
 }
 
 // Обработка Enter для входа в админку

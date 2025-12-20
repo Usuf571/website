@@ -730,8 +730,84 @@ function recordSale(productId, quantity, price) {
     localStorage.setItem('salesData', JSON.stringify(salesData));
 }
 
+// ========== ЭФФЕКТ ПОЯВЛЕНИЯ ПРИ СКРОЛИНГЕ (Scroll Animation) ==========
+function initScrollAnimation() {
+    const observerOptions = {
+        threshold: 0.1,           // Запускается когда 10% элемента видно
+        rootMargin: '0px 0px -50px 0px'  // Начинать чуть раньше
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                // Добавляем класс анимации
+                entry.target.classList.add('scroll-animate-in');
+                // Останавливаем наблюдение для экономии ресурсов
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // Наблюдаем за всеми элементами с классом scroll-animate
+    document.querySelectorAll('.scroll-animate').forEach(element => {
+        observer.observe(element);
+    });
+}
+
+// Запуск анимации при загрузке и изменении содержимого
+function initScrollAnimationForNewElements() {
+    // Инициализируем при загрузке страницы
+    setTimeout(() => {
+        initScrollAnimation();
+    }, 100);
+}
+
+// Переопределяем renderProducts для добавления классов анимации
+const originalRenderProducts = renderProducts;
+renderProducts = function(filter = 'all', search = '', minPrice = 0, maxPrice = Infinity, page = 1) {
+    const result = originalRenderProducts.call(this, filter, search, minPrice, maxPrice, page);
+    
+    // Добавляем классы анимации для товаров
+    document.querySelectorAll('.product-card').forEach((card, index) => {
+        card.classList.add('scroll-animate');
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
+    
+    // Инициализируем IntersectionObserver для новых элементов
+    setTimeout(() => initScrollAnimation(), 100);
+    
+    return result;
+};
+
 // Запуск снежинок при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     createSnowflakes();
     updateUserUI();
+    
+    // Инициализируем анимацию скролинга
+    initScrollAnimationForNewElements();
+    
+    // Добавляем классы анимации к начальным элементам
+    document.querySelectorAll('.product-card').forEach((card, index) => {
+        card.classList.add('scroll-animate');
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
+    
+    document.querySelectorAll('.carousel-item').forEach((item, index) => {
+        item.classList.add('scroll-animate');
+        item.style.animationDelay = `${index * 0.15}s`;
+    });
+    
+    document.querySelectorAll('.review-item').forEach((item, index) => {
+        item.classList.add('scroll-animate');
+        item.style.animationDelay = `${index * 0.15}s`;
+    });
+    
+    // Добавляем анимацию к другим элементам на странице
+    document.querySelectorAll('section').forEach((section, index) => {
+        section.classList.add('scroll-animate');
+        section.style.animationDelay = `${index * 0.2}s`;
+    });
+    
+    initScrollAnimation();
 });

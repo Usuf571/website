@@ -1570,3 +1570,124 @@ input, textarea, select {
         grid-template-columns: 1fr;
     }
 }
+
+/* ========== ЭФФЕКТ ПОЯВЛЕНИЯ ПРИ СКРОЛИНГЕ (Scroll Animation) ========== */
+
+/* Инициальное состояние для анимируемых элементов */
+.scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+/* Класс для активированной анимации */
+.scroll-animate-in {
+    animation: scrollFadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Анимация: появление с поднятием (fade in + slide up) */
+@keyframes scrollFadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Альтернативная анимация: слева направо */
+@keyframes scrollFadeInLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Альтернативная анимация: справа налево */
+@keyframes scrollFadeInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Альтернативная анимация: с масштабированием */
+@keyframes scrollFadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Специальная анимация для карточек товаров */
+.product-card.scroll-animate-in {
+    animation: scrollFadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Специальная анимация для отзывов */
+.carousel-item.scroll-animate-in,
+.review-item.scroll-animate-in {
+    animation: scrollFadeInScale 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Специальная анимация для секций */
+section.scroll-animate-in {
+    animation: scrollFadeInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Эффект при наведении на карточку товара (усиление после появления) */
+.product-card.scroll-animate-in:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+}
+
+/* Плавный переход для hover эффекта */
+.product-card {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.3s ease;
+}
+
+/* Адаптивность для мобилей */
+@media (max-width: 768px) {
+    .scroll-animate {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    @keyframes scrollFadeInUp {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+/* Отключение анимации при низких FPS (для экономии ресурсов) */
+@media (prefers-reduced-motion: reduce) {
+    .scroll-animate,
+    .scroll-animate-in {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}

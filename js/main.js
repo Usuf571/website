@@ -7,9 +7,16 @@ if (isDarkMode) {
 
 function toggleDarkMode() {
     isDarkMode = !isDarkMode;
-    localStorage.setItem('darkMode', isDarkMode);
-    document.body.classList.toggle('dark-mode');
-    document.querySelector('.theme-toggle').textContent = isDarkMode ? '☀️' : '🌙';
+    
+    // Добавляем переходный класс для плавного изменения фона
+    document.body.style.transition = 'background 0.5s cubic-bezier(0.4, 0.0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0.0, 0.2, 1)';
+    
+    // Задержка 0.5 секунд перед изменением темы для визуального эффекта
+    setTimeout(() => {
+        document.body.classList.toggle('dark-mode');
+        document.querySelector('.theme-toggle').textContent = isDarkMode ? '☀️' : '🌙';
+        localStorage.setItem('darkMode', isDarkMode);
+    }, 250);
 }
 
 // Данные из localStorage или JSON

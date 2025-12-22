@@ -5,11 +5,6 @@ let reviews = JSON.parse(localStorage.getItem('reviews')) || [
     { id: 2, author: 'Мария П.', text: 'Качество товаров на высоте.', rating: 4, date: '2025-12-02' },
     { id: 3, author: 'Алексей К.', text: 'Рекомендую всем!', rating: 5, date: '2025-12-03' }
 ];
-let orders = JSON.parse(localStorage.getItem('orders')) || [
-    { id: 1, orderNumber: 'ORD-001', customerName: 'Иван Петров', customerEmail: 'ivan@mail.ru', customerPhone: '+996 555 123456', deliveryAddress: 'г. Ош, ул. Ленина, д. 15', status: 'delivered', total: 15999, date: '2025-12-01', items: [{name: 'iPhone 15', quantity: 1, price: 1099}], note: 'Доставлено' },
-    { id: 2, orderNumber: 'ORD-002', customerName: 'Мария Сидорова', customerEmail: 'maria@mail.ru', customerPhone: '+996 777 654321', deliveryAddress: 'г. Бишкек, ул. Чуй, д. 42', status: 'shipped', total: 8999, date: '2025-12-02', items: [{name: 'Samsung Galaxy S24', quantity: 1, price: 999}], note: 'В пути' },
-    { id: 3, orderNumber: 'ORD-003', customerName: 'Алексей Иванов', customerEmail: 'alex@mail.ru', customerPhone: '+996 500 234567', deliveryAddress: 'г. Нарын, ул. Советская, д. 8', status: 'processing', total: 24998, date: '2025-12-03', items: [{name: 'MacBook Pro', quantity: 1, price: 1999}], note: 'На комплектации' }
-];
 let settings = JSON.parse(localStorage.getItem('settings')) || {
     siteName: 'ЭлектроМир',
     storeAddress: 'Moscow, Russia',
@@ -103,7 +98,6 @@ function switchTab(tab) {
     if (tab === 'products') renderAdminTable('products', document.getElementById('adminSearchProducts').value);
     if (tab === 'warehouse') renderWarehouseData();
     if (tab === 'reviews') renderAdminTable('reviews', document.getElementById('adminSearchReviews').value);
-    if (tab === 'orders') renderOrders(document.getElementById('adminSearchOrders').value);
     if (tab === 'analytics') renderAnalytics();
     if (tab === 'settings') renderSettingsDisplay();
 }
@@ -111,13 +105,7 @@ function switchTab(tab) {
 // Debounce для поиска
 function debouncedRender(tab) {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-        if (tab === 'orders') {
-            renderOrders(document.getElementById('adminSearchOrders').value);
-        } else {
-            renderAdminTable(tab, document.getElementById(`adminSearch${tab.charAt(0).toUpperCase() + tab.slice(1)}`).value);
-        }
-    }, 300);
+    debounceTimer = setTimeout(() => renderAdminTable(tab, document.getElementById(`adminSearch${tab.charAt(0).toUpperCase() + tab.slice(1)}`).value), 300);
 }
 
 // Универсальная сортировка
@@ -177,29 +165,12 @@ function renderAdminTable(tab, search = '') {
 
 // Выбор всех
 function toggleSelectAll(tab) {
-    if (tab === 'orders') {
-        const checkboxes = document.querySelectorAll('.order-selector');
-        checkboxes.forEach(cb => cb.checked = document.getElementById('selectAllOrders').checked);
-    } else {
-        const checkboxes = document.querySelectorAll(`#${tab}Tab .item-checkbox`);
-        checkboxes.forEach(cb => cb.checked = document.getElementById(`selectAll${tab.charAt(0).toUpperCase() + tab.slice(1)}`).checked);
-    }
+    const checkboxes = document.querySelectorAll(`#${tab}Tab .item-checkbox`);
+    checkboxes.forEach(cb => cb.checked = document.getElementById(`selectAll${tab.charAt(0).toUpperCase() + tab.slice(1)}`).checked);
 }
 
 // Массовое удаление
 function bulkDelete(tab) {
-    if (tab === 'orders') {
-        const selectedIds = Array.from(document.querySelectorAll('.order-selector:checked')).map(cb => parseInt(cb.dataset.id));
-        if (selectedIds.length === 0) return alert('Выберите заказы!');
-        if (confirm(`Удалить ${selectedIds.length} заказ(ов)?`)) {
-            orders = orders.filter(o => !selectedIds.includes(o.id));
-            localStorage.setItem('orders', JSON.stringify(orders));
-            renderOrders();
-            alert(`✅ ${selectedIds.length} заказ(ов) удалено!`);
-        }
-        return;
-    }
-    
     const selectedIds = Array.from(document.querySelectorAll(`#${tab}Tab .item-checkbox:checked`)).map(cb => parseInt(cb.value));
     if (selectedIds.length === 0) return alert('Выберите элементы!');
     if (confirm(`Удалить ${selectedIds.length} ${tab === 'products' ? 'товаров' : 'отзывов'}?`)) {
@@ -959,204 +930,6 @@ function downloadCSV(csv, filename) {
     link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
     link.download = filename;
     link.click();
-}
-
-/* ================================ */
-/* 📋 ФУНКЦИИ УПРАВЛЕНИЯ ЗАКАЗАМИ */
-/* ================================ */
-
-// Отрисовка карточек заказов
-function renderOrders(search = '') {
-    const grid = document.getElementById('ordersGrid');
-    if (!grid) return;
-    
-    let filteredOrders = orders;
-    if (search) {
-        filteredOrders = orders.filter(order => 
-            order.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
-            order.customerName.toLowerCase().includes(search.toLowerCase()) ||
-            order.customerEmail.toLowerCase().includes(search.toLowerCase())
-        );
-    }
-    
-    grid.innerHTML = '';
-    filteredOrders.forEach(order => {
-        const card = document.createElement('div');
-        card.className = 'order-card';
-        card.innerHTML = `
-            <div class="order-header">
-                <span class="order-number">${order.orderNumber}</span>
-                <span class="order-status ${order.status}">
-                    ${getStatusIcon(order.status)} ${getStatusText(order.status)}
-                </span>
-            </div>
-            
-            <div class="order-info">
-                <div class="order-info-row">
-                    <span class="order-info-label">Клиент:</span>
-                    <span>${order.customerName}</span>
-                </div>
-                <div class="order-info-row">
-                    <span class="order-info-label">Email:</span>
-                    <span>${order.customerEmail}</span>
-                </div>
-                <div class="order-info-row">
-                    <span class="order-info-label">Телефон:</span>
-                    <span>${order.customerPhone}</span>
-                </div>
-                <div class="order-info-row">
-                    <span class="order-info-label">Адрес:</span>
-                    <span>${order.deliveryAddress}</span>
-                </div>
-                <div class="order-info-row">
-                    <span class="order-info-label">Дата:</span>
-                    <span>${new Date(order.date).toLocaleDateString('ru-RU')}</span>
-                </div>
-            </div>
-            
-            <div class="order-total">Сумма: ${order.total} сом</div>
-            
-            <div class="order-items">
-                ${order.items.map(item => `
-                    <div class="order-item">
-                        ${item.name} x${item.quantity} = ${item.price * item.quantity} сом
-                    </div>
-                `).join('')}
-            </div>
-            
-            <div class="order-actions">
-                <button class="order-edit-btn" onclick="editOrder(${order.id})">✏️ Редактировать</button>
-                <button class="order-delete-btn" onclick="deleteOrder(${order.id})">🗑️ Удалить</button>
-            </div>
-            
-            <div class="order-checkbox">
-                <input type="checkbox" class="order-selector" data-id="${order.id}">
-            </div>
-        `;
-        grid.appendChild(card);
-    });
-}
-
-// Получить текст статуса
-function getStatusText(status) {
-    const statusMap = {
-        'pending': 'Ожидание',
-        'processing': 'Обработка',
-        'shipped': 'Отправлено',
-        'delivered': 'Доставлено',
-        'cancelled': 'Отменено'
-    };
-    return statusMap[status] || status;
-}
-
-// Получить иконку статуса
-function getStatusIcon(status) {
-    const iconMap = {
-        'pending': '⏳',
-        'processing': '⚙️',
-        'shipped': '🚚',
-        'delivered': '✅',
-        'cancelled': '❌'
-    };
-    return iconMap[status] || '📦';
-}
-
-// Открыть модал редактирования заказа
-function editOrder(id) {
-    const order = orders.find(o => o.id === id);
-    if (!order) return;
-    
-    document.getElementById('editOrderId').value = order.id;
-    document.getElementById('orderNumber').value = order.orderNumber;
-    document.getElementById('orderCustomerName').value = order.customerName;
-    document.getElementById('orderCustomerEmail').value = order.customerEmail;
-    document.getElementById('orderCustomerPhone').value = order.customerPhone;
-    document.getElementById('orderDeliveryAddress').value = order.deliveryAddress;
-    document.getElementById('orderStatus').value = order.status;
-    document.getElementById('orderTotal').value = order.total;
-    document.getElementById('orderDate').value = order.date;
-    document.getElementById('orderNote').value = order.note || '';
-    
-    const itemsDiv = document.getElementById('orderItems');
-    itemsDiv.innerHTML = order.items.map(item => `
-        <div class="order-item">
-            <strong>${item.name}</strong> x${item.quantity} = ${item.price * item.quantity} сом
-        </div>
-    `).join('');
-    
-    document.getElementById('orderModalTitle').textContent = `Редактировать заказ ${order.orderNumber}`;
-    document.getElementById('orderModal').style.display = 'block';
-}
-
-// Сохранить изменения заказа
-document.addEventListener('DOMContentLoaded', () => {
-    const orderForm = document.getElementById('orderForm');
-    if (orderForm) {
-        orderForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const orderId = parseInt(document.getElementById('editOrderId').value);
-            const order = orders.find(o => o.id === orderId);
-            
-            if (order) {
-                order.customerName = document.getElementById('orderCustomerName').value;
-                order.customerEmail = document.getElementById('orderCustomerEmail').value;
-                order.customerPhone = document.getElementById('orderCustomerPhone').value;
-                order.deliveryAddress = document.getElementById('orderDeliveryAddress').value;
-                order.status = document.getElementById('orderStatus').value;
-                order.note = document.getElementById('orderNote').value;
-                
-                localStorage.setItem('orders', JSON.stringify(orders));
-                closeOrderModal();
-                renderOrders();
-                alert('✅ Заказ успешно обновлен!');
-            }
-        });
-    }
-});
-
-// Закрыть модал заказа
-function closeOrderModal() {
-    document.getElementById('orderModal').style.display = 'none';
-    document.getElementById('orderForm').reset();
-}
-
-// Удалить заказ
-function deleteOrder(id) {
-    if (confirm('⚠️ Вы уверены, что хотите удалить этот заказ?')) {
-        orders = orders.filter(o => o.id !== id);
-        localStorage.setItem('orders', JSON.stringify(orders));
-        renderOrders();
-        alert('✅ Заказ удален!');
-    }
-}
-
-// Массовое удаление заказов
-function bulkDelete(type) {
-    if (type === 'orders') {
-        const selected = Array.from(document.querySelectorAll('.order-selector:checked')).map(checkbox => parseInt(checkbox.dataset.id));
-        if (selected.length === 0) {
-            alert('❌ Выберите заказы для удаления');
-            return;
-        }
-        
-        if (confirm(`⚠️ Вы уверены, что хотите удалить ${selected.length} заказ(ов)?`)) {
-            orders = orders.filter(o => !selected.includes(o.id));
-            localStorage.setItem('orders', JSON.stringify(orders));
-            renderOrders();
-            alert('✅ Заказы удалены!');
-        }
-        return;
-    }
-}
-
-// Экспорт заказов в Excel
-function exportOrders() {
-    let csv = 'Номер заказа,Клиент,Email,Телефон,Адрес,Статус,Сумма,Дата\n';
-    orders.forEach(order => {
-        csv += `"${order.orderNumber}","${order.customerName}","${order.customerEmail}","${order.customerPhone}","${order.deliveryAddress}","${getStatusText(order.status)}","${order.total}","${order.date}"\n`;
-    });
-    downloadCSV(csv, 'orders_export.csv');
 }
 
 // Обработка Enter для входа в админку

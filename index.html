@@ -237,7 +237,13 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">ЭлектроМир</div>
-                <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+                <button class="menu-toggle" onclick="toggleMenu()" title="Меню">
+                    <svg class="hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="6" x2="21" y2="6" class="line line-1"></line>
+                        <line x1="3" y1="12" x2="21" y2="12" class="line line-2"></line>
+                        <line x1="3" y1="18" x2="21" y2="18" class="line line-3"></line>
+                    </svg>
+                </button>
                 <div class="search-bar">
                     <input type="text" id="searchInput" placeholder="Поиск товаров...">
                 </div>
@@ -368,6 +374,84 @@
             <p id="noOrders" style="text-align: center; color: #999; padding: 2rem;">Заказов нет</p>
         </div>
     </div>
+
+    <!-- Секция Наши Достижения -->
+    <section class="achievements-section">
+        <div class="container">
+            <h2>Наши достижения</h2>
+            <p class="achievements-subtitle">Мы гордимся своими успехами на рынке электроники</p>
+            
+            <div class="achievements-grid">
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <h3>10+ лет опыта</h3>
+                    <p>Работаем на рынке электроники уже более 10 лет, завоевав доверие тысяч клиентов</p>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <h3>50K+ клиентов</h3>
+                    <p>Более 50,000 довольных клиентов по всей стране доверяют нам свои покупки</p>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                    </div>
+                    <h3>100% гарантия</h3>
+                    <p>Полная гарантия на все товары и обязательство качества в каждой покупке</p>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                    </div>
+                    <h3>Быстрая доставка</h3>
+                    <p>Доставляем товары в любую точку страны за 2-3 рабочих дня</p>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"></path>
+                            <path d="M12 6v6l4 2"></path>
+                        </svg>
+                    </div>
+                    <h3>Поддержка 24/7</h3>
+                    <p>Наша команда поддержки всегда готова помочь вам в любой момент времени</p>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+                            <polyline points="16 12 12 8 8 12"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Лучшие цены</h3>
+                    <p>Гарантируем самые низкие цены на рынке электроники с постоянными акциями</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Карусель отзывов -->
     <section class="reviews-section">

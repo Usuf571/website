@@ -67,8 +67,10 @@ function hidePreloader() {
 // Функция переключения мобильного меню
 function toggleMenu() {
     const menu = document.getElementById('categoriesMenu');
+    const toggle = document.querySelector('.menu-toggle');
     if (menu) {
         menu.classList.toggle('active');
+        toggle.classList.toggle('active');
     }
 }
 

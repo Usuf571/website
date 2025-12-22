@@ -47,7 +47,7 @@ body {
     transition: var(--theme-transition);
 }
 
-/* Прелоадер - Красивая анимация загрузки с зелёным градиентом */
+/* Прелоадер - Красивая анимация загрузки с микрочипом */
 #preloader {
     position: fixed;
     top: 0;
@@ -68,93 +68,277 @@ body {
     pointer-events: none;
 }
 
-.loader {
-    position: relative;
-    width: 120px;
-    height: 120px;
+/* Микрочип анимация */
+.microchip {
+    display: block;
+    width: 8em;
+    height: auto;
+    color: #ffffff;
 }
 
-/* Первое кольцо - внешнее */
-.loader::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border: 4px solid rgba(255, 255, 255, 0.15);
-    border-radius: 50%;
-    animation: spinOuter 2.5s linear infinite;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+.microchip__center,
+.microchip__dot,
+.microchip__line,
+.microchip__lines,
+.microchip__spark,
+.microchip__wave {
+    animation-duration: 7s;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+    animation-iteration-count: infinite;
 }
 
-/* Второе кольцо - градиент */
-.loader::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border: 4px solid transparent;
-    border-top-color: rgba(255, 255, 255, 0.9);
-    border-right-color: rgba(255, 255, 255, 0.7);
-    border-bottom-color: rgba(255, 255, 255, 0.5);
-    border-left-color: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    animation: spinInner 1.5s ease-in-out infinite;
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+.microchip__core,
+.microchip__dot {
+    fill: #ffffff;
 }
 
-/* Третий слой точек */
-.loader::before {
-    box-shadow: 
-        inset 0 0 15px rgba(255, 255, 255, 0.2),
-        0 0 20px rgba(255, 255, 255, 0.3);
+.microchip__center,
+.microchip__wave {
+    transform-origin: 25px 25px;
 }
 
-@keyframes spinOuter {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+.microchip__center {
+    animation-name: center-scale;
 }
 
-@keyframes spinInner {
-    0% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(180deg) scale(0.95); }
-    100% { transform: rotate(360deg) scale(1); }
+.microchip__dot--1 {
+    animation-name: dot-scale1;
+    transform-origin: 3px 38px;
+}
+.microchip__dot--2 {
+    animation-name: dot-scale2;
+    transform-origin: 3px 54px;
+}
+.microchip__dot--3 {
+    animation-name: dot-scale3;
+    transform-origin: 3px 70px;
+}
+.microchip__dot--4 {
+    animation-name: dot-scale4;
+    transform-origin: 3px 3px;
+}
+.microchip__dot--5 {
+    animation-name: dot-scale5;
+    transform-origin: 20px 3px;
+}
+.microchip__dot--6 {
+    animation-name: dot-scale6;
+    transform-origin: 3px 30px;
+}
+.microchip__dot--7 {
+    animation-name: dot-scale7;
+    transform-origin: 37px 3px;
+}
+.microchip__dot--8 {
+    animation-name: dot-scale8;
+    transform-origin: 54px 3px;
+}
+.microchip__dot--9 {
+    animation-name: dot-scale9;
+    transform-origin: 71px 3px;
 }
 
-.loader-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 1rem;
-    font-weight: 700;
-    text-align: center;
-    width: 150px;
-    margin-top: 70px;
-    letter-spacing: 0.5px;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+.microchip__line {
+    stroke: #ffffff;
 }
 
-.loading-dots::after {
-    content: '●';
-    display: inline-block;
-    animation: dotsPulse 1.5s ease-in-out infinite;
-    margin-left: 2px;
-    font-size: 0.8em;
+.microchip__line--1 { animation-name: line-draw1; }
+.microchip__line--2 { animation-name: line-draw2; }
+.microchip__line--3 { animation-name: line-draw3; }
+.microchip__line--4 { animation-name: line-draw4; }
+.microchip__line--5 { animation-name: line-draw5; }
+.microchip__line--6 { animation-name: line-draw6; }
+.microchip__line--7 { animation-name: line-draw7; }
+.microchip__line--8 { animation-name: line-draw8; }
+.microchip__line--9 { animation-name: line-draw9; }
+
+.microchip__lines {
+    animation-name: lines-scale;
+    transform-origin: 54px 54px;
 }
 
-@keyframes dotsPulse {
-    0%, 100% { 
-        content: '●';
-        opacity: 0.3;
-        transform: scale(0.8);
-    }
-    50% { 
-        content: '●';
+.microchip__spark,
+.microchip__wave {
+    animation-timing-function: linear;
+    stroke: #2ecc71;
+}
+
+.microchip__spark--1 { animation-name: spark1; }
+.microchip__spark--2 { animation-name: spark2; }
+.microchip__spark--3 { animation-name: spark3; }
+.microchip__spark--4 { animation-name: spark4; }
+.microchip__spark--5 { animation-name: spark5; }
+.microchip__spark--6 { animation-name: spark6; }
+.microchip__spark--7 { animation-name: spark7; }
+.microchip__spark--8 { animation-name: spark8; }
+.microchip__spark--9 { animation-name: spark9; }
+
+.microchip__wave--1 { animation-name: wave-scale1; }
+.microchip__wave--2 { animation-name: wave-scale2; }
+
+/* Анимации */
+@keyframes center-scale {
+    from, to { transform: scale(0); }
+    12.5%, 75% { transform: scale(1); }
+}
+
+@keyframes dot-scale1 {
+    from, 20%, 81.25%, to { transform: scale(0); }
+    32.5%, 68.75% { transform: scale(1); }
+}
+@keyframes dot-scale2 {
+    from, 10.5%, 87.5%, to { transform: scale(0); }
+    23%, 75% { transform: scale(1); }
+}
+@keyframes dot-scale3 {
+    from, 20%, 81.25%, to { transform: scale(0); }
+    32.5%, 68.75% { transform: scale(1); }
+}
+@keyframes dot-scale4 {
+    from, 20%, 81.25%, to { transform: scale(0); }
+    32.5%, 68.75% { transform: scale(1); }
+}
+@keyframes dot-scale5 {
+    from, 11.5%, 87.5%, to { transform: scale(0); }
+    24%, 75% { transform: scale(1); }
+}
+@keyframes dot-scale6 {
+    from, 14.5%, 85%, to { transform: scale(0); }
+    27%, 72.5% { transform: scale(1); }
+}
+@keyframes dot-scale7 {
+    from, 20%, 81.25%, to { transform: scale(0); }
+    32.5%, 68.75% { transform: scale(1); }
+}
+@keyframes dot-scale8 {
+    from, 11%, 87.5%, to { transform: scale(0); }
+    23.5%, 75% { transform: scale(1); }
+}
+@keyframes dot-scale9 {
+    from, 20%, 81.25%, to { transform: scale(0); }
+    32.5%, 68.75% { transform: scale(1); }
+}
+
+@keyframes line-draw1 {
+    from, 93.75%, to { stroke-dashoffset: 59; }
+    25%, 68.75% { stroke-dashoffset: 17; }
+}
+@keyframes line-draw2 {
+    from, 93.75%, to { stroke-dashoffset: 42; }
+    25%, 68.75% { stroke-dashoffset: 0; }
+}
+@keyframes line-draw3 {
+    from, 93.75%, to { stroke-dashoffset: 59; }
+    25%, 68.75% { stroke-dashoffset: 17; }
+}
+@keyframes line-draw4 {
+    from, 93.75%, to { stroke-dashoffset: 78; }
+    25%, 68.75% { stroke-dashoffset: 18; }
+}
+@keyframes line-draw5 {
+    from, 93.75%, to { stroke-dashoffset: 60; }
+    25%, 68.75% { stroke-dashoffset: 0; }
+}
+@keyframes line-draw6 {
+    from, 93.75%, to { stroke-dashoffset: 91; }
+    25%, 68.75% { stroke-dashoffset: 31; }
+}
+@keyframes line-draw7 {
+    from, 93.75%, to { stroke-dashoffset: 60; }
+    25%, 68.75% { stroke-dashoffset: 17; }
+}
+@keyframes line-draw8 {
+    from, 93.75%, to { stroke-dashoffset: 43; }
+    25%, 68.75% { stroke-dashoffset: 0; }
+}
+@keyframes line-draw9 {
+    from, 93.75%, to { stroke-dashoffset: 60; }
+    25%, 68.75% { stroke-dashoffset: 17; }
+}
+
+@keyframes lines-scale {
+    from {
         opacity: 1;
-        transform: scale(1.2);
+        transform: scale(0);
+    }
+    12.5%, 75% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    93.75%, to {
+        opacity: 0;
+        transform: scale(0.5);
     }
 }
+
+@keyframes spark1 {
+    from, 27.5% { stroke-dashoffset: 59; }
+    50%, 52.5% { stroke-dashoffset: -25; }
+    75%, to { stroke-dashoffset: -109; }
+}
+@keyframes spark2 {
+    from, 27.5% { stroke-dashoffset: 42; }
+    50%, 52.5% { stroke-dashoffset: -42; }
+    75%, to { stroke-dashoffset: -126; }
+}
+@keyframes spark3 {
+    from, 27.5% { stroke-dashoffset: 59; }
+    50%, 52.5% { stroke-dashoffset: -25; }
+    75%, to { stroke-dashoffset: -109; }
+}
+@keyframes spark4 {
+    from, 27.5% { stroke-dashoffset: 78; }
+    50%, 52.5% { stroke-dashoffset: -42; }
+    75%, to { stroke-dashoffset: -162; }
+}
+@keyframes spark5 {
+    from, 27.5% { stroke-dashoffset: 60; }
+    50%, 52.5% { stroke-dashoffset: -60; }
+    75%, to { stroke-dashoffset: -180; }
+}
+@keyframes spark6 {
+    from, 27.5% { stroke-dashoffset: 91; }
+    50%, 52.5% { stroke-dashoffset: -29; }
+    75%, to { stroke-dashoffset: -149; }
+}
+@keyframes spark7 {
+    from, 27.5% { stroke-dashoffset: 60; }
+    50%, 52.5% { stroke-dashoffset: -26; }
+    75%, to { stroke-dashoffset: -112; }
+}
+@keyframes spark8 {
+    from, 27.5% { stroke-dashoffset: 43; }
+    50%, 52.5% { stroke-dashoffset: -43; }
+    75%, to { stroke-dashoffset: -129; }
+}
+@keyframes spark9 {
+    from, 27.5% { stroke-dashoffset: 60; }
+    50%, 52.5% { stroke-dashoffset: -26; }
+    75%, to { stroke-dashoffset: -112; }
+}
+
+@keyframes wave-scale1 {
+    from, 0%, 25%, 50%, 75% {
+        stroke-width: 6px;
+        transform: scale(1);
+    }
+    10%, 35%, 60%, 85%, to {
+        stroke-width: 0;
+        transform: scale(2);
+    }
+}
+
+@keyframes wave-scale2 {
+    from, 5%, 30%, 55%, 80% {
+        stroke-width: 6px;
+        transform: scale(1);
+    }
+    15%, 40%, 65%, 90%, to {
+        stroke-width: 0;
+        transform: scale(2);
+    }
+}
+
 .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
 
 /* Header */
@@ -224,8 +408,7 @@ header {
 /* ======================== */
 /* 🎨 ИКОНКИ ПЕРЕКЛЮЧЕНИЯ */
 /* ======================== */
-.theme-toggle, .wishlist-icon, .cart-icon { 
-    font-size: 1.5rem; 
+.theme-toggle, .wishlist-icon, .cart-icon, .user-btn { 
     cursor: pointer; 
     position: relative; 
     transition: all 0.3s ease; 
@@ -238,12 +421,21 @@ header {
     width: 44px;
     height: 44px;
     border-radius: 50%;
+    padding: 0;
+}
+
+.theme-toggle svg, .wishlist-icon svg, .cart-icon svg, .user-btn svg {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
+    transition: all 0.3s ease;
 }
 
 /* Фон для иконок при наведении */
 .theme-toggle::before,
 .wishlist-icon::before,
-.cart-icon::before {
+.cart-icon::before,
+.user-btn::before {
     content: '';
     position: absolute;
     width: 0;
@@ -256,21 +448,31 @@ header {
 
 .theme-toggle:hover::before,
 .wishlist-icon:hover::before,
-.cart-icon:hover::before {
+.cart-icon:hover::before,
+.user-btn:hover::before {
     width: 44px;
     height: 44px;
 }
 
 .theme-toggle:hover, 
 .wishlist-icon:hover, 
-.cart-icon:hover { 
+.cart-icon:hover,
+.user-btn:hover { 
     transform: scale(1.15) rotate(5deg);
-    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+    filter: drop-shadow(0 0 8px rgba(46, 204, 113, 0.4));
+}
+
+.theme-toggle:hover svg,
+.wishlist-icon:hover svg,
+.cart-icon:hover svg,
+.user-btn:hover svg {
+    stroke-width: 2.5;
 }
 
 .theme-toggle:active,
 .wishlist-icon:active,
-.cart-icon:active {
+.cart-icon:active,
+.user-btn:active {
     transform: scale(0.95);
 }
 
@@ -284,6 +486,7 @@ header {
     font-weight: bold;
     box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
     animation: badgePulse 2s ease-in-out infinite;
+    margin-left: 0.3rem;
 }
 
 @keyframes badgePulse {
@@ -343,7 +546,6 @@ header {
     background: none; 
     border: none; 
     color: white; 
-    font-size: 1.5rem; 
     cursor: pointer;
     transition: all 0.3s ease;
     width: 44px;
@@ -351,11 +553,43 @@ header {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0;
+}
+
+.menu-toggle svg {
+    width: 28px;
+    height: 28px;
+    transition: transform 0.3s ease;
+}
+
+.menu-toggle .line {
+    transition: stroke-dasharray 0.3s ease, stroke-dashoffset 0.3s ease;
+    stroke-dasharray: 24;
 }
 
 .menu-toggle:hover {
-    transform: scale(1.2) rotate(90deg);
-    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4));
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px rgba(46, 204, 113, 0.4));
+}
+
+.menu-toggle:hover svg {
+    transform: rotate(180deg);
+}
+
+.menu-toggle.active .line-1 {
+    stroke-dasharray: 24;
+    stroke-dashoffset: -5;
+    transform: rotate(45deg) translateY(10px);
+}
+
+.menu-toggle.active .line-2 {
+    opacity: 0;
+}
+
+.menu-toggle.active .line-3 {
+    stroke-dasharray: 24;
+    stroke-dashoffset: -5;
+    transform: rotate(-45deg) translateY(-10px);
 }
 
 .menu-toggle:active {
@@ -375,8 +609,20 @@ header {
         padding: 1rem; 
         border-radius: 0 0 20px 20px;
         transition: var(--theme-transition);
+        animation: slideDown 0.3s ease;
     }
     .menu-toggle { display: flex !important; }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Фильтры */
@@ -851,7 +1097,180 @@ header {
     }
 }
 /* ================================ */
-/* 🎨 КАРУСЕЛЬ ОТЗЫВОВ - УЛУЧШЕННАЯ */
+/* � СЕКЦИЯ НАШИ ДОСТИЖЕНИЯ */
+/* ================================ */
+
+.achievements-section {
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(39, 174, 96, 0.08) 100%);
+    padding: 4rem 2rem;
+    margin: 4rem 0;
+    border-radius: 30px;
+    box-shadow: 0 10px 40px rgba(39, 174, 96, 0.12);
+    position: relative;
+    overflow: hidden;
+}
+
+.achievements-section::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(46, 204, 113, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.achievements-section::after {
+    content: '';
+    position: absolute;
+    bottom: -80px;
+    left: -80px;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(39, 174, 96, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.achievements-section h2 {
+    font-size: 2.8rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    font-weight: 800;
+    background: linear-gradient(135deg, #27ae60, #16a34a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.achievements-subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 3rem;
+    position: relative;
+    z-index: 1;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.achievement-card {
+    background: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(39, 174, 96, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.achievement-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(46, 204, 113, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.achievement-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(39, 174, 96, 0.25);
+    border-color: rgba(39, 174, 96, 0.3);
+}
+
+.achievement-card:hover::before {
+    left: 100%;
+}
+
+.achievement-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #27ae60 0%, #16a34a 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+}
+
+.achievement-card:hover .achievement-icon {
+    transform: scale(1.15) rotate(10deg);
+    box-shadow: 0 12px 30px rgba(39, 174, 96, 0.4);
+}
+
+.achievement-card h3 {
+    font-size: 1.4rem;
+    color: #27ae60;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    transition: color 0.3s ease;
+}
+
+.achievement-card:hover h3 {
+    color: #16a34a;
+}
+
+.achievement-card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .achievements-section {
+        padding: 2.5rem 1.5rem;
+        margin: 2.5rem 0;
+    }
+
+    .achievements-section h2 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .achievements-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+    }
+
+    .achievements-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .achievement-card {
+        padding: 1.5rem;
+    }
+
+    .achievement-icon {
+        width: 70px;
+        height: 70px;
+    }
+
+    .achievement-card h3 {
+        font-size: 1.2rem;
+    }
+}
+
+/* ================================ */
+/* �🎨 КАРУСЕЛЬ ОТЗЫВОВ - УЛУЧШЕННАЯ */
 /* ================================ */
 
 .reviews-section { 

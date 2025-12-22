@@ -12,15 +12,238 @@
     
     <!-- Красивый анимированный прелоадер -->
     <div id="preloader">
-        <div class="loader"></div>
-        <div class="loader-text">Загрузка<span class="loading-dots"></span></div>
+        <svg class="microchip" viewBox="0 0 128 128" width="128px" height="128px" role="img" aria-label="Loading microchip animation">
+            <symbol id="dot-1">
+                <circle r="3" cx="3" cy="38" />
+            </symbol>
+            <symbol id="dot-2">
+                <circle r="3" cx="3" cy="54" />
+            </symbol>
+            <symbol id="dot-3">
+                <circle r="3" cx="3" cy="70" />
+            </symbol>
+            <symbol id="dot-4">
+                <circle r="3" cx="3" cy="3" />
+            </symbol>
+            <symbol id="dot-5">
+                <circle r="3" cx="20" cy="3" />
+            </symbol>
+            <symbol id="dot-6">
+                <circle r="3" cx="3" cy="30" />
+            </symbol>
+            <symbol id="dot-7">
+                <circle r="3" cx="37" cy="3" />
+            </symbol>
+            <symbol id="dot-8">
+                <circle r="3" cx="54" cy="3" />
+            </symbol>
+            <symbol id="dot-9">
+                <circle r="3" cx="71" cy="3" />
+            </symbol>
+            <symbol id="line-1">
+                <polyline points="12 54,12 46,3 46,3 38" stroke-dasharray="42 42" />
+            </symbol>
+            <symbol id="line-2">
+                <polyline points="29 54,3 54" stroke-dasharray="42 42" />
+            </symbol>
+            <symbol id="line-3">
+                <polyline points="12 54,12 62,3 62,3 70" stroke-dasharray="42 42" />
+            </symbol>
+            <symbol id="line-4">
+                <polyline points="28 20,28 12,20 12,20 3" stroke-dasharray="60 60" />
+            </symbol>
+            <symbol id="line-5">
+                <polyline points="37 29,37 20,3 20,3 3" stroke-dasharray="60 60" />
+            </symbol>
+            <symbol id="line-6">
+                <polyline points="15 20,15 30,3 30" stroke-dasharray="60 60" />
+            </symbol>
+            <symbol id="line-7">
+                <polyline points="54 12,37 12,37 3" stroke-dasharray="43 43" />
+            </symbol>
+            <symbol id="line-8">
+                <polyline points="54 29,54 3" stroke-dasharray="43 43" />
+            </symbol>
+            <symbol id="line-9">
+                <polyline points="54 12,71 12,71 3" stroke-dasharray="43 43" />
+            </symbol>
+            <symbol id="spark-1">
+                <polyline points="12 54,12 46,3 46,3 38" stroke-dasharray="15 69" />
+            </symbol>
+            <symbol id="spark-2">
+                <polyline points="29 54,3 54" stroke-dasharray="15 69" />
+            </symbol>
+            <symbol id="spark-3">
+                <polyline points="12 54,12 62,3 62,3 70" stroke-dasharray="15 69" />
+            </symbol>
+            <symbol id="spark-4">
+                <polyline points="28 20,28 12,20 12,20 3" stroke-dasharray="15 105" />
+            </symbol>
+            <symbol id="spark-5">
+                <polyline points="37 29,37 20,3 20,3 3" stroke-dasharray="15 105" />
+            </symbol>
+            <symbol id="spark-6">
+                <polyline points="15 20,15 30,3 30" stroke-dasharray="15 105" />
+            </symbol>
+            <symbol id="spark-7">
+                <polyline points="54 12,37 12,37 3" stroke-dasharray="15 71" />
+            </symbol>
+            <symbol id="spark-8">
+                <polyline points="54 29,54 3" stroke-dasharray="15 71" />
+            </symbol>
+            <symbol id="spark-9">
+                <polyline points="54 12,71 12,71 3" stroke-dasharray="15 71" />
+            </symbol>
+            <symbol id="wave">
+                <rect x="3" y="3" rx="2.5" ry="2.5" width="44" height="44" />
+            </symbol>
+            <g transform="translate(10,10)">
+                <g class="microchip__lines" stroke-linecap="round" stroke-linejoin="round">
+                    <g>
+                        <g fill="none" stroke="currentColor">
+                            <use class="microchip__line microchip__line--1" href="#line-1" />
+                            <use class="microchip__spark microchip__spark--1" href="#spark-1" />
+                            <use class="microchip__line microchip__line--2" href="#line-2" />
+                            <use class="microchip__spark microchip__spark--2" href="#spark-2" />
+                            <use class="microchip__line microchip__line--3" href="#line-3" />
+                            <use class="microchip__spark microchip__spark--3" href="#spark-3" />
+                        </g>
+                        <g fill="currentColor">
+                            <use class="microchip__dot microchip__dot--1" href="#dot-1" />
+                            <use class="microchip__dot microchip__dot--2" href="#dot-2" />
+                            <use class="microchip__dot microchip__dot--3" href="#dot-3" />
+                        </g>
+                    </g>
+                    <g>
+                        <g fill="none" stroke="currentColor">
+                            <use class="microchip__line microchip__line--4" href="#line-4" />
+                            <use class="microchip__spark microchip__spark--4" href="#spark-4" />
+                            <use class="microchip__line microchip__line--5" href="#line-5" />
+                            <use class="microchip__spark microchip__spark--5" href="#spark-5" />
+                            <use class="microchip__line microchip__line--6" href="#line-6" />
+                            <use class="microchip__spark microchip__spark--6" href="#spark-6" />
+                        </g>
+                        <g fill="currentColor">
+                            <use class="microchip__dot microchip__dot--4" href="#dot-4" />
+                            <use class="microchip__dot microchip__dot--5" href="#dot-5" />
+                            <use class="microchip__dot microchip__dot--6" href="#dot-6" />
+                        </g>
+                    </g>
+                    <g>
+                        <g fill="none" stroke="currentColor">
+                            <use class="microchip__line microchip__line--7" href="#line-7" />
+                            <use class="microchip__spark microchip__spark--7" href="#spark-7" />
+                            <use class="microchip__line microchip__line--8" href="#line-8" />
+                            <use class="microchip__spark microchip__spark--8" href="#spark-8" />
+                            <use class="microchip__line microchip__line--9" href="#line-9" />
+                            <use class="microchip__spark microchip__spark--9" href="#spark-9" />
+                        </g>
+                        <g fill="currentColor">
+                            <use class="microchip__dot microchip__dot--7" href="#dot-7" />
+                            <use class="microchip__dot microchip__dot--8" href="#dot-8" />
+                            <use class="microchip__dot microchip__dot--9" href="#dot-9" />
+                        </g>
+                    </g>
+                    <g transform="translate(108,0) scale(-1,1)">
+                        <g fill="none" stroke="currentColor">
+                            <use class="microchip__line microchip__line--4" href="#line-4" />
+                            <use class="microchip__spark microchip__spark--4" href="#spark-4" />
+                            <use class="microchip__line microchip__line--5" href="#line-5" />
+                            <use class="microchip__spark microchip__spark--5" href="#spark-5" />
+                            <use class="microchip__line microchip__line--6" href="#line-6" />
+                            <use class="microchip__spark microchip__spark--6" href="#spark-6" />
+                        </g>
+                        <g fill="currentColor">
+                            <use class="microchip__dot microchip__dot--4" href="#dot-4" />
+                            <use class="microchip__dot microchip__dot--5" href="#dot-5" />
+                            <use class="microchip__dot microchip__dot--6" href="#dot-6" />
+                        </g>
+                    </g>
+                    <g transform="translate(108,0) scale(-1,1)">
+                        <g fill="none" stroke="currentColor">
+                            <use class="microchip__line microchip__line--1" href="#line-1" />
+                            <use class="microchip__spark microchip__spark--1" href="#spark-1" />
+                            <use class="microchip__line microchip__line--2" href="#line-2" />
+                            <use class="microchip__spark microchip__spark--2" href="#spark-2" />
+                            <use class="microchip__line microchip__line--3" href="#line-3" />
+                            <use class="microchip__spark microchip__spark--3" href="#spark-3" />
+                        </g>
+                        <g fill="currentColor">
+                            <use class="microchip__dot microchip__dot--1" href="#dot-1" />
+                            <use class="microchip__dot microchip__dot--2" href="#dot-2" />
+                            <use class="microchip__dot microchip__dot--3" href="#dot-3" />
+                        </g>
+                    </g>
+                    <g transform="translate(108,108) scale(-1,-1)">
+                        <g fill="none" stroke="currentColor">
+                            <use class="microchip__line microchip__line--4" href="#line-4" />
+                            <use class="microchip__spark microchip__spark--4" href="#spark-4" />
+                            <use class="microchip__line microchip__line--5" href="#line-5" />
+                            <use class="microchip__spark microchip__spark--5" href="#spark-5" />
+                            <use class="microchip__line microchip__line--6" href="#line-6" />
+                            <use class="microchip__spark microchip__spark--6" href="#spark-6" />
+                        </g>
+                        <g fill="currentColor">
+                            <use class="microchip__dot microchip__dot--4" href="#dot-4" />
+                            <use class="microchip__dot microchip__dot--5" href="#dot-5" />
+                            <use class="microchip__dot microchip__dot--6" href="#dot-6" />
+                        </g>
+                    </g>
+                    <g transform="translate(0,108) scale(1,-1)">
+                        <g fill="none" stroke="currentColor">
+                            <use class="microchip__line microchip__line--7" href="#line-7" />
+                            <use class="microchip__spark microchip__spark--7" href="#spark-7" />
+                            <use class="microchip__line microchip__line--8" href="#line-8" />
+                            <use class="microchip__spark microchip__spark--8" href="#spark-8" />
+                            <use class="microchip__line microchip__line--9" href="#line-9" />
+                            <use class="microchip__spark microchip__spark--9" href="#spark-9" />
+                        </g>
+                        <g fill="currentColor">
+                            <use class="microchip__dot microchip__dot--7" href="#dot-7" />
+                            <use class="microchip__dot microchip__dot--8" href="#dot-8" />
+                            <use class="microchip__dot microchip__dot--9" href="#dot-9" />
+                        </g>
+                    </g>
+                    <g transform="translate(0,108) scale(1,-1)">
+                        <g fill="none" stroke="currentColor">
+                            <use class="microchip__line microchip__line--4" href="#line-4" />
+                            <use class="microchip__spark microchip__spark--4" href="#spark-4" />
+                            <use class="microchip__line microchip__line--5" href="#line-5" />
+                            <use class="microchip__spark microchip__spark--5" href="#spark-5" />
+                            <use class="microchip__line microchip__line--6" href="#line-6" />
+                            <use class="microchip__spark microchip__spark--6" href="#spark-6" />
+                        </g>
+                        <g fill="currentColor">
+                            <use class="microchip__dot microchip__dot--4" href="#dot-4" />
+                            <use class="microchip__dot microchip__dot--5" href="#dot-5" />
+                            <use class="microchip__dot microchip__dot--6" href="#dot-6" />
+                        </g>
+                    </g>
+                </g>
+                <g transform="translate(29,29)">
+                    <g class="microchip__center">
+                        <g fill="none" stroke="currentColor" stroke-width="6">
+                            <use class="microchip__wave microchip__wave--1" href="#wave" />
+                            <use class="microchip__wave microchip__wave--2" href="#wave" />
+                        </g>
+                        <rect class="microchip__core" fill="currentColor" rx="5" ry="5" width="50" height="50" />
+                    </g>
+                </g>
+            </g>
+        </svg>
     </div>
 
     <header>
         <div class="container">
             <div class="header-content">
                 <div class="logo">ЭлектроМир</div>
-                <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+                <button class="menu-toggle" onclick="toggleMenu()" title="Меню">
+                    <svg class="hamburger" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="6" x2="21" y2="6" class="line line-1"></line>
+                        <line x1="3" y1="12" x2="21" y2="12" class="line line-2"></line>
+                        <line x1="3" y1="18" x2="21" y2="18" class="line line-3"></line>
+                    </svg>
+                </button>
                 <div class="search-bar">
                     <input type="text" id="searchInput" placeholder="Поиск товаров...">
                 </div>
@@ -30,14 +253,31 @@
                     <button class="category-btn" data-category="tablets">Планшеты</button>
                     <button class="category-btn" data-category="laptops">Ноутбуки</button>
                 </div>
-                <button class="theme-toggle" onclick="toggleDarkMode()" title="Тема">🌙</button>
+                <button class="theme-toggle" onclick="toggleDarkMode()" title="Тема">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
                 <button class="wishlist-icon" onclick="toggleWishlist()" title="Избранное">
-                    ❤️ <span id="wishlistCount">0</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <span id="wishlistCount">0</span>
                 </button>
                 <div class="cart-icon" onclick="toggleCart()" title="Корзина">
-                    🛒 <span id="cartCount">0</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"></circle>
+                        <circle cx="20" cy="21" r="1"></circle>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                    </svg>
+                    <span id="cartCount">0</span>
                 </div>
-                <button class="user-btn" onclick="toggleUserMenu()" title="Профиль" id="userBtn">👤</button>
+                <button class="user-btn" onclick="toggleUserMenu()" title="Профиль" id="userBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </button>
                 <a href="admin.html" class="admin-btn">Админка</a>
             </div>
         </div>
@@ -134,6 +374,84 @@
             <p id="noOrders" style="text-align: center; color: #999; padding: 2rem;">Заказов нет</p>
         </div>
     </div>
+
+    <!-- Секция Наши Достижения -->
+    <section class="achievements-section">
+        <div class="container">
+            <h2>Наши достижения</h2>
+            <p class="achievements-subtitle">Мы гордимся своими успехами на рынке электроники</p>
+            
+            <div class="achievements-grid">
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <h3>10+ лет опыта</h3>
+                    <p>Работаем на рынке электроники уже более 10 лет, завоевав доверие тысяч клиентов</p>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <h3>50K+ клиентов</h3>
+                    <p>Более 50,000 довольных клиентов по всей стране доверяют нам свои покупки</p>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                    </div>
+                    <h3>100% гарантия</h3>
+                    <p>Полная гарантия на все товары и обязательство качества в каждой покупке</p>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                    </div>
+                    <h3>Быстрая доставка</h3>
+                    <p>Доставляем товары в любую точку страны за 2-3 рабочих дня</p>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"></path>
+                            <path d="M12 6v6l4 2"></path>
+                        </svg>
+                    </div>
+                    <h3>Поддержка 24/7</h3>
+                    <p>Наша команда поддержки всегда готова помочь вам в любой момент времени</p>
+                </div>
+
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+                            <polyline points="16 12 12 8 8 12"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Лучшие цены</h3>
+                    <p>Гарантируем самые низкие цены на рынке электроники с постоянными акциями</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Карусель отзывов -->
     <section class="reviews-section">

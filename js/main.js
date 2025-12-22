@@ -818,6 +818,7 @@ document.addEventListener('DOMContentLoaded', () => {
         item.style.animationDelay = `${index * 0.15}s`;
     });
     
+    
     document.querySelectorAll('.review-item').forEach((item, index) => {
         item.classList.add('scroll-animate');
         item.style.animationDelay = `${index * 0.15}s`;
@@ -831,3 +832,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     initScrollAnimation();
 });
+
+// ==================== FAQ ACCORDION TOGGLE ====================
+function toggleFaq(element) {
+    const faqItem = element.closest('.faq-item');
+    
+    // Закрываем все остальные открытые элементы
+    document.querySelectorAll('.faq-item.active').forEach(item => {
+        if (item !== faqItem) {
+            item.classList.remove('active');
+        }
+    });
+    
+    // Переключаем класс active для текущего элемента
+    faqItem.classList.toggle('active');
+}
+
